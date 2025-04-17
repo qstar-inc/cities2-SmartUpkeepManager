@@ -138,24 +138,24 @@ namespace SmartUpkeepManager
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.DumpTruck)), $"Specify the upkeep cost for each Dump Trucks.\r\nMod default: {Defaults.DumpTruck}" },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.GarbageCap)), "Garbage Storage" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.GarbageCap)), $"Specify the upkeep cost for tonnes of garbage stored. 30% for short term storage + 50% less for industrial wastes only.\r\nMod default: {Defaults.GarbageCap}" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.GarbageCap)), $"Specify the upkeep cost for tonnes of garbage stored. 30% for short term storage + 90% less for industrial wastes only.\r\nMod default: {Defaults.GarbageCap}" },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.GarbageProcessing)), "Garbage Processing" },
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.GarbageProcessing)), $"Specify the upkeep cost for processing each tonnes of garbage stored.\r\nMod default: {Defaults.GarbageProcessing}" },
 
                 // Education & Research
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentPrimary)), "Elementary Seats" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentPrimary)), $"Specify the upkeep cost for having the ability to educated each elementary students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentPrimary}" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentPrimary)), "Elementary Seats" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentPrimary)), $"Specify the upkeep cost for having the ability to educated each elementary students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentPrimary}" },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentSecondary)), "High School Seats" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentSecondary)), $"Specify the upkeep cost for having the ability to educated each high school students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentSecondary}" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentSecondary)), "High School Seats" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentSecondary)), $"Specify the upkeep cost for having the ability to educated each high school students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentSecondary}" },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentTertiary)), "College Seats" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentTertiary)), $"Specify the upkeep cost for having the ability to educated each college students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentTertiary}" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentTertiary)), "College Seats" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentTertiary)), $"Specify the upkeep cost for having the ability to educated each college students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentTertiary}" },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentUniversity)), "University Seats" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentUniversity)), $"Specify the upkeep cost for having the ability to educated each university students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.StudentUniversity}" },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.Student)), "Student Seats" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.Student)), $"Specify the upkeep cost for having the ability to educate each students. This will be incurring whether someone is admitted to a seat or not.\r\nMod default: {Defaults.Student}" },
 
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.StudentGraduation)), "Graduation Bonus" },
                 { m_Setting.GetOptionDescLocaleID(nameof(Setting.StudentGraduation)), $"Specify the upkeep cost for each % of graduation bonus.\r\nMod default: {Defaults.StudentGraduation}" },

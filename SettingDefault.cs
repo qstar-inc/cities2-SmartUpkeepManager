@@ -33,27 +33,24 @@ namespace SmartUpkeepManager
         public static readonly int Ambulance = 1000;
         public static readonly int MedicalHelicopter = 5000;
         public static readonly int Patient = 100;
-        public static readonly int HealthBonus = 2000;
+        public static readonly int HealthBonus = 200;
         public static readonly int HealthRange = 250;
-        public static readonly int Treatment = 30000;
+        public static readonly int Treatment = 10000;
         public static readonly int Hearse = 1000;
         public static readonly int BodyStorage = 500;
         public static readonly int BodyProcessing = 500;
 
         // Garbage Management
         public static readonly int GarbageCap = 20;
-        public static readonly int GarbageTruck = 1000;
-        public static readonly int DumpTruck = 1000;
+        public static readonly int GarbageTruck = 600;
+        public static readonly int DumpTruck = 500;
         public static readonly int GarbageProcessing = 100;
 
         // Education & Research
-        public static readonly int StudentPrimary = 300;
-        public static readonly int StudentSecondary = 500;
-        public static readonly int StudentTertiary = 800;
-        public static readonly int StudentUniversity = 1000;
-        public static readonly int StudentGraduation = 5000;
-        public static readonly int StudentWellbeing = 5000;
-        public static readonly int StudentHealth = 5000;
+        public static readonly int Student = 10;
+        public static readonly int StudentGraduation = 2500;
+        public static readonly int StudentWellbeing = 1000;
+        public static readonly int StudentHealth = 1000;
         public static readonly int ResearchFacility = 50000;
 
         // Fire & Rescue
@@ -66,7 +63,7 @@ namespace SmartUpkeepManager
         public static readonly int DisasterFacility = 10000;
         public static readonly int ShelterCap = 500;
         public static readonly int EvacuationBus = 1000;
-        public static readonly int EmergencyGenerator = 10000;
+        public static readonly int EmergencyGenerator = 100;
 
         // Police & Administration
         public static readonly int PatrolCar = 600;
@@ -77,8 +74,8 @@ namespace SmartUpkeepManager
         public static readonly int Intelligence = 50000;
         public static readonly int PrisonVan = 600;
         public static readonly int PrisonerCap = 100;
-        public static readonly int PrisonerWellbeing = 5000;
-        public static readonly int PrisonerHealth = 5000;
+        public static readonly int PrisonerWellbeing = 800;
+        public static readonly int PrisonerHealth = 800;
         public static readonly int WelfareOffice = 15000;
         public static readonly int AdminBuilding = 50000;
 
@@ -97,11 +94,11 @@ namespace SmartUpkeepManager
         public static readonly int EnergyFuel = 5000;
         public static readonly int EnergyElectricity = 8000;
         //public static readonly int ProductionBoost = 1000;
-        public static readonly int MaintenanceBoost = 20000;
+        public static readonly int MaintenanceBoost = 2000;
         public static readonly int DispatchCenter = 500;
         public static readonly int TradedResource = 1000;
         public static readonly int DeliveryTruck = 1000;
-        public static readonly int ComfortFactor = 5;
+        public static readonly int ComfortFactor = 100;
 
         // Parks & Recreation
         public static readonly int ParkMaintenance = 7500;
@@ -134,10 +131,10 @@ namespace SmartUpkeepManager
         // General
         public static readonly int ServiceCoverageMultiplier = 100;
         public static readonly int PlotPrice = 50;
-        public static readonly int Uniqueness = 300;
-        public static readonly int GroundPollution = 2000;
-        public static readonly int AirPollution = 2000;
-        public static readonly int NoisePollution = 1000;
+        public static readonly int Uniqueness = 150;
+        public static readonly int GroundPollution = 300;
+        public static readonly int AirPollution = 300;
+        public static readonly int NoisePollution = 100;
         public static readonly int EmployeeUpkeep = 100;
         public static readonly int StorageUpkeep = 10;
     }
@@ -189,10 +186,7 @@ namespace SmartUpkeepManager
             GarbageTruck = Defaults.GarbageTruck;
             DumpTruck = Defaults.DumpTruck;
             GarbageProcessing = Defaults.GarbageProcessing;
-            StudentPrimary = Defaults.StudentPrimary;
-            StudentSecondary = Defaults.StudentSecondary;
-            StudentTertiary = Defaults.StudentTertiary;
-            StudentUniversity = Defaults.StudentUniversity;
+            Student = Defaults.Student;
             StudentGraduation = Defaults.StudentGraduation;
             StudentWellbeing = Defaults.StudentWellbeing;
             StudentHealth = Defaults.StudentHealth;
@@ -312,10 +306,10 @@ namespace SmartUpkeepManager
             GarbageTruck = 0;
             DumpTruck = 0;
             GarbageProcessing = 0;
-            StudentPrimary = 0;
-            StudentSecondary = 0;
-            StudentTertiary = 0;
-            StudentUniversity = 0;
+            //StudentPrimary = 0;
+            //StudentSecondary = 0;
+            //StudentTertiary = 0;
+            Student = 0;
             StudentGraduation = 0;
             StudentWellbeing = 0;
             StudentHealth = 0;

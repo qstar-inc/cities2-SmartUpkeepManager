@@ -380,40 +380,40 @@ namespace SmartUpkeepManager
         }
 
         // Education & Research
-        [SettingsUISection(Page3, Education)]
-        [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
-        public int StudentPrimary
-        {
-            get => GetValue(nameof(StudentPrimary), Defaults.StudentPrimary);
-            set => SetValue(nameof(StudentPrimary), value, Save);
-        }
+        //[SettingsUISection(Page3, Education)]
+        //[SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
+        //[SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        //public int StudentPrimary
+        //{
+        //    get => GetValue(nameof(StudentPrimary), Defaults.StudentPrimary);
+        //    set => SetValue(nameof(StudentPrimary), value, Save);
+        //}
+
+        //[SettingsUISection(Page3, Education)]
+        //[SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
+        //[SettingsUISlider(min = 0, max = 2500, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        //public int StudentSecondary
+        //{
+        //    get => GetValue(nameof(StudentSecondary), Defaults.StudentSecondary);
+        //    set => SetValue(nameof(StudentSecondary), value, Save);
+        //}
+
+        //[SettingsUISection(Page3, Education)]
+        //[SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
+        //[SettingsUISlider(min = 0, max = 1000, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        //public int StudentTertiary
+        //{
+        //    get => GetValue(nameof(StudentTertiary), Defaults.StudentTertiary);
+        //    set => SetValue(nameof(StudentTertiary), value, Save);
+        //}
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
-        public int StudentSecondary
+        [SettingsUISlider(min = 0, max = 100, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        public int Student
         {
-            get => GetValue(nameof(StudentSecondary), Defaults.StudentSecondary);
-            set => SetValue(nameof(StudentSecondary), value, Save);
-        }
-
-        [SettingsUISection(Page3, Education)]
-        [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
-        public int StudentTertiary
-        {
-            get => GetValue(nameof(StudentTertiary), Defaults.StudentTertiary);
-            set => SetValue(nameof(StudentTertiary), value, Save);
-        }
-
-        [SettingsUISection(Page3, Education)]
-        [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
-        public int StudentUniversity
-        {
-            get => GetValue(nameof(StudentUniversity), Defaults.StudentUniversity);
-            set => SetValue(nameof(StudentUniversity), value, Save);
+            get => GetValue(nameof(Student), Defaults.Student);
+            set => SetValue(nameof(Student), value, Save);
         }
 
         [SettingsUISection(Page3, Education)]
@@ -1077,7 +1077,7 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
         public int GroundPollution
         {
             get => GetValue(nameof(GroundPollution), Defaults.GroundPollution);
@@ -1086,7 +1086,7 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
         public int AirPollution
         {
             get => GetValue(nameof(AirPollution), Defaults.AirPollution);

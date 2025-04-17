@@ -80,7 +80,7 @@ namespace SmartUpkeepManager.Systems
                                 buildingDict.Add(prefabName, entity);
                                 if (!ogUpkeep.ContainsKey(prefabName) && serviceConsumption.m_Upkeep > 0)
                                     ogUpkeep.Add(prefabName, serviceConsumption.m_Upkeep);
-                                    Mod.log.Info($"Collecting {prefabName}");
+                                    //Mod.log.Info($"Collecting {prefabName}");
                             }
 
                             //foreach (var component in prefabBase.components)
@@ -136,7 +136,7 @@ namespace SmartUpkeepManager.Systems
             {
                 inGame = false;
             }
-            Mod.log.Info("OnGameLoadingComplete End");
+            //Mod.log.Info("OnGameLoadingComplete End");
         }
 
         protected override void OnUpdate()

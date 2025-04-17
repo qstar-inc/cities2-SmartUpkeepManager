@@ -4,6 +4,8 @@ using Game;
 using System;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
+using System.Runtime.Remoting.Lifetime;
 
 namespace SmartUpkeepManager.Systems
 {
@@ -191,10 +193,32 @@ namespace SmartUpkeepManager.Systems
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Ambulance * Hospital.m_AmbulanceCapacity, "Ambulance");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.MedicalHelicopter * Hospital.m_MedicalHelicopterCapacity, "MedicalHelicopter");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Patient * Hospital.m_PatientCapacity, "Patient");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.HealthBonus * Hospital.m_TreatmentBonus, "HealthBonus");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, ComputeCombinedValue(Hospital.m_HealthRange.x, Hospital.m_HealthRange.y, Mod.m_Setting.HealthRange), "HealthRange");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatDiseases ? Mod.m_Setting.Treatment : 0f, "TreatDiseases");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.HealthBonus * Hospital.m_TreatmentBonus, "HealthBonus");
+
+                                    float weightedX = SegmentedWeight(Hospital.m_HealthRange.x, Mod.m_Setting.HealthRange);
+                                    float weightedY = SegmentedWeight(Hospital.m_HealthRange.y, Mod.m_Setting.HealthRange);
+
+                                    float extra = 0;
+                                    if (Hospital.m_TreatDiseases || Hospital.m_TreatInjuries)
+                                    {
+                                        if (Hospital.m_PatientCapacity > 0)
+                                        {
+                                            extra = (Mod.m_Setting.Treatment / Hospital.m_PatientCapacity) * (Hospital.m_TreatmentBonus / Hospital.m_PatientCapacity);
+                                        } else
+                                        {
+                                            extra = Mod.m_Setting.Treatment;
+                                        }
+                                    } else
+                                    {
+                                        if (Hospital.m_TreatmentBonus > 0)
+                                        {
+                                            extra = Mod.m_Setting.HealthBonus;
+                                        }
+                                    }
+                                    var valx = ((Math.Abs(weightedX - weightedY) / Mod.m_Setting.HealthRange) / 100f) * extra;
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, valx, "HealthBonusRange");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatDiseases ? Mod.m_Setting.Treatment : 0f, "TreatDiseases");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
                                 }
 
                                 DeathcareFacility DeathcareFacility = prefabBase.GetComponent<DeathcareFacility>();
@@ -202,7 +226,7 @@ namespace SmartUpkeepManager.Systems
                                 if (DeathcareFacility != null)
                                 {
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Hearse * DeathcareFacility.m_HearseCapacity, "Hearse");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.BodyStorage * DeathcareFacility.m_StorageCapacity * (DeathcareFacility.m_LongTermStorage ? 1f : 0.3f), "BodyStorage");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.BodyStorage / 1000f) * DeathcareFacility.m_StorageCapacity * (DeathcareFacility.m_LongTermStorage ? 1f : 0.3f), "BodyStorage");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.BodyProcessing * DeathcareFacility.m_ProcessingRate, "BodyProcessing");
                                 }
 
@@ -213,8 +237,8 @@ namespace SmartUpkeepManager.Systems
                                 {
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GarbageTruck * GarbageFacility.m_VehicleCapacity, "GarbageTruck");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.DumpTruck * GarbageFacility.m_TransportCapacity, "DumpTruck");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageCap / 1000f) * GarbageFacility.m_GarbageCapacity * (GarbageFacility.m_LongTermStorage ? 1f : 0.3f) * (GarbageFacility.m_IndustrialWasteOnly ? 0.5f : 1f), "GarbageCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageProcessing / 1000f) * GarbageFacility.m_ProcessingSpeed, "GarbageProcessing");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageCap / 1000f) * GarbageFacility.m_GarbageCapacity * (GarbageFacility.m_LongTermStorage ? 1f : 0.3f) * (GarbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f), "GarbageCap");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageProcessing / 1000f) * (GarbageFacility.m_ProcessingSpeed / 1000f) * (GarbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f), "GarbageProcessing");
                                 }
 
                                 // Education & Research
@@ -222,24 +246,7 @@ namespace SmartUpkeepManager.Systems
                                 CrossExamine("School");
                                 if (School != null)
                                 {
-                                    int schoolMult = 1;
-                                    if (School.m_Level == SchoolLevel.Elementary)
-                                    {
-                                        schoolMult = Mod.m_Setting.StudentPrimary;
-                                    }
-                                    else if (School.m_Level == SchoolLevel.HighSchool)
-                                    {
-                                        schoolMult = Mod.m_Setting.StudentSecondary;
-                                    }
-                                    else if (School.m_Level == SchoolLevel.College)
-                                    {
-                                        schoolMult = Mod.m_Setting.StudentTertiary;
-                                    }
-                                    else if (School.m_Level == SchoolLevel.University)
-                                    {
-                                        schoolMult = Mod.m_Setting.StudentUniversity;
-                                    }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, schoolMult * School.m_StudentCapacity, $"Student ({School.m_Level})");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Student * School.m_StudentCapacity, $"Student_{School.m_Level}");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentGraduation * School.m_GraduationModifier * 100f, "StudentGraduation");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentWellbeing * School.m_StudentWellbeing, "StudentWellbeing");
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentHealth * School.m_StudentHealth, "StudentHealth");
@@ -386,7 +393,7 @@ namespace SmartUpkeepManager.Systems
                                             transportMuliplier = Mod.m_Setting.Rocket;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, transportMuliplier * TransportDepot.m_VehicleCapacity, $"TransportType ({transportType})");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, transportMuliplier * TransportDepot.m_VehicleCapacity, $"TransportType_{transportType}");
 
                                     Game.Vehicles.EnergyTypes energyType = TransportDepot.m_EnergyTypes;
                                     float energyValue = 0f;
@@ -402,7 +409,7 @@ namespace SmartUpkeepManager.Systems
                                             energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"EnergyTypes ({energyType})");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"EnergyTypes_{energyType}");
 
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Math.Max(Mod.m_Setting.MaintenanceBoost, Mod.m_Setting.MaintenanceBoost * (TransportDepot.m_MaintenanceDuration * 100f)), "MaintenanceBoost");
 
@@ -434,7 +441,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes ({CargoTransportStation.m_CarRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes_{CargoTransportStation.m_CarRefuelTypes}");
                                     }
 
                                     if (!CargoTransportStation.m_TrainRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -452,7 +459,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes ({CargoTransportStation.m_TrainRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes_{CargoTransportStation.m_TrainRefuelTypes}");
                                     }
 
                                     if (!CargoTransportStation.m_WatercraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -470,7 +477,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel ({CargoTransportStation.m_WatercraftRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel_{CargoTransportStation.m_WatercraftRefuelTypes}");
                                     }
 
                                     if (!CargoTransportStation.m_AircraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -488,7 +495,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes ({CargoTransportStation.m_AircraftRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes_{CargoTransportStation.m_AircraftRefuelTypes}");
                                     }
                                 }
 
@@ -511,7 +518,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes ({TransportStation.m_CarRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes_{TransportStation.m_CarRefuelTypes}");
                                     }
 
                                     if (!TransportStation.m_TrainRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -529,7 +536,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes ({TransportStation.m_TrainRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes_{TransportStation.m_TrainRefuelTypes}");
                                     }
 
                                     if (!TransportStation.m_WatercraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -547,7 +554,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel ({TransportStation.m_WatercraftRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel_{TransportStation.m_WatercraftRefuelTypes}");
                                     }
 
                                     if (!TransportStation.m_AircraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
@@ -565,7 +572,7 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes ({TransportStation.m_AircraftRefuelTypes})");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes_{TransportStation.m_AircraftRefuelTypes}");
                                     }
 
                                     Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ComfortFactor * TransportStation.m_ComfortFactor * 100f, "ComfortFactor");
@@ -611,7 +618,7 @@ namespace SmartUpkeepManager.Systems
                                             leisureMultiplier = Mod.m_Setting.LeisureSightseeing;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, leisureMultiplier * (Mod.m_Setting.LeisureEfficieny * (LeisureProvider.m_Efficiency / 100f)), $"LeisureProvider ({LeisureProvider.m_LeisureType})");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, leisureMultiplier * (Mod.m_Setting.LeisureEfficieny * (LeisureProvider.m_Efficiency / 100f)), $"LeisureProvider_{LeisureProvider.m_LeisureType}");
                                 }
 
                                 Attraction Attraction = prefabBase.GetComponent<Attraction>();
@@ -656,7 +663,7 @@ namespace SmartUpkeepManager.Systems
                                 CrossExamine("Workplace");
                                 if (Workplace != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EmployeeUpkeep * Workplace.m_Workplaces, "EmployeeUpkeep");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EmployeeUpkeep * Workplace.m_Workplaces, $"EmployeeUpkeep_{Workplace.m_Complexity}");
                                 }
 
                                 StorageLimit StorageLimit = prefabBase.GetComponent<StorageLimit>();
@@ -670,9 +677,18 @@ namespace SmartUpkeepManager.Systems
                                 CrossExamine("Pollution");
                                 if (Pollution != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundPollution * (Pollution.m_GroundPollution / 1000f), "GroundPollution");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AirPollution * (Pollution.m_AirPollution / 1000f), "AirPollution");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NoisePollution * (Pollution.m_NoisePollution / 1000f), "NoisePollution");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundPollution * Math.Abs(Pollution.m_GroundPollution / 1000f), "GroundPollution");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AirPollution * Math.Abs(Pollution.m_AirPollution / 1000f), "AirPollution");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NoisePollution * Math.Abs(Pollution.m_NoisePollution / 1000f), "NoisePollution");
+                                }
+
+                                PollutionModifier PollutionModifier = prefabBase.GetComponent<PollutionModifier>();
+                                CrossExamine("PollutionModifier");
+                                if (PollutionModifier != null)
+                                {
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundPollution * Math.Abs(PollutionModifier.m_GroundPollutionMultiplier * 10f), "GroundPollutionMultiplier");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AirPollution * Math.Abs(PollutionModifier.m_AirPollutionMultiplier * 10f), "AirPollutionMultiplier");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NoisePollution * Math.Abs(PollutionModifier.m_NoisePollutionMultiplier * 10f), "NoisePollutionMultiplier");
                                 }
 
                                 UniqueObject UniqueObject = prefabBase.GetComponent<UniqueObject>();
@@ -696,60 +712,55 @@ namespace SmartUpkeepManager.Systems
                                     }
                                 }
 
-                                CityEffects CityEffects = prefabBase.GetComponent<CityEffects>();
-                                CrossExamine("CityEffects");
-                                if (CityEffects != null && Mod.m_Setting.CityBonusMultiplier)
+                                ServiceUpgrade ServiceUpgrade = prefabBase.GetComponent<ServiceUpgrade>();
+                                CrossExamine("ServiceUpgrade");
+                                if (ServiceUpgrade != null)
                                 {
-                                    foreach (var data in CityEffects.m_Effects)
-                                    {
-                                        if (data.m_Mode == ModifierValueMode.Relative)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), "CityEffects.Relative");
-                                        }
-                                        if (data.m_Mode == ModifierValueMode.Absolute)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta - 1f), "CityEffects.Absolute");
-                                        }
-                                        if (data.m_Mode == ModifierValueMode.InverseRelative)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), "CityEffects.InverseRelative");
-                                        }
-                                    }
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, ServiceUpgrade.m_UpgradeCost * 0.05f, "ServiceUpgrade");
                                 }
 
-                                LocalEffects LocalEffects = prefabBase.GetComponent<LocalEffects>();
-                                CrossExamine("LocalEffects");
-                                if (LocalEffects != null && Mod.m_Setting.CityBonusMultiplier)
-                                {
-                                    foreach (var data in LocalEffects.m_Effects)
-                                    {
-                                        if (data.m_Mode == ModifierValueMode.Relative)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), "LocalEffects.Relative");
-                                        }
-                                        if (data.m_Mode == ModifierValueMode.Absolute)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta - 1f), "LocalEffects.Absolute");
-                                        }
-                                        if (data.m_Mode == ModifierValueMode.InverseRelative)
-                                        {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), "LocalEffects.InverseRelative");
-                                        }
-                                    }
-                                }
+                                //CityEffects CityEffects = prefabBase.GetComponent<CityEffects>();
+                                //CrossExamine("CityEffects");
+                                //if (CityEffects != null && Mod.m_Setting.CityBonusMultiplier)
+                                //{
+                                //    foreach (var data in CityEffects.m_Effects)
+                                //    {
+                                //        if (data.m_Mode.HasFlag(ModifierValueMode.Relative) || data.m_Mode.HasFlag(ModifierValueMode.InverseRelative))
+                                //        {
+                                //            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), $"CityEffects_{data.m_Mode}");
+                                //        }
+                                //    }
+                                //}
+
+                                //LocalEffects LocalEffects = prefabBase.GetComponent<LocalEffects>();
+                                //CrossExamine("LocalEffects");
+                                //if (LocalEffects != null && Mod.m_Setting.CityBonusMultiplier)
+                                //{
+                                //    foreach (var data in LocalEffects.m_Effects)
+                                //    {
+                                //        if (data.m_Mode.HasFlag(ModifierValueMode.Relative) || data.m_Mode.HasFlag(ModifierValueMode.InverseRelative))
+                                //        {
+                                //            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), $"LocalEffects_{data.m_Mode}");
+                                //        }
+                                //        //if (data.m_Mode == ModifierValueMode.Absolute)
+                                //        //{
+                                //        //    Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta - 100f), "LocalEffects.Absolute");
+                                //        //}
+                                //    }
+                                //}
 
                                 if (prefabSystem.TryGetPrefab(prefabData, out BuildingExtensionPrefab BuildingExtension) && BuildingExtension is not null)
                                 {
                                     int plotSize = BuildingExtension.m_OverrideLotSize.x * BuildingExtension.m_OverrideLotSize.y;
                                     if (plotSize > 0)
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Log(plotSize + 1)), "PlotPrice");
+                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Round(Math.Log(plotSize + 1))), "PlotPrice");
                                     }
                                 }
 
                                 if (prefabSystem.TryGetPrefab(prefabData, out BuildingPrefab Building) && Building is not null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Log(Building.lotSize + 1)), "PlotPrice");
+                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Round(Math.Log(Building.lotSize + 1))), "PlotPrice");
                                 }
 
                                 multiplier = Math.Max(multiplier, 0.1f);
@@ -843,12 +854,22 @@ namespace SmartUpkeepManager.Systems
                 return N + (2f * N) + (3f * N) + (t * 4f * N);
             }
         }
-        float ComputeCombinedValue(float x, float y, float N)
+        float ComputeCombinedValue(float2 healthRange, bool disease, bool injuries)
         {
+            float x = healthRange.x;
+            float y = healthRange.y;
+            float N = Mod.m_Setting.HealthRange;
+
             float weightedX = SegmentedWeight(x, N);
             float weightedY = SegmentedWeight(y, N);
+
+            float extra = 0;
+            if (disease || injuries)
+            {
+                extra = Mod.m_Setting.Treatment;
+            }
             //Mod.log.Info($"HealthRange ({x} to {y} = Math.Abs({weightedX} - {weightedY}))");
-            return Math.Abs(weightedX - weightedY);
+            return ((Math.Abs(weightedX - weightedY)/N)/100f) + extra;
         }
 
         void Adder(ref float prevUpkeepValue, ref float upkeepValue, bool logX, float adder, string text)
@@ -856,7 +877,7 @@ namespace SmartUpkeepManager.Systems
             prevUpkeepValue = upkeepValue;
             upkeepValue += (float)adder;
             var diff = upkeepValue - prevUpkeepValue;
-            if (!prevVal.ContainsKey(text))
+            if (!prevVal.ContainsKey(text) && diff != 0f)
             {
                 prevVal[text] = diff;
             }
@@ -867,6 +888,11 @@ namespace SmartUpkeepManager.Systems
         {
             prevMultiplierValue = multipler;
             multipler += (float)adder;
+            var diff = multipler - prevMultiplierValue;
+            if (!prevVal.ContainsKey($"{text}_x") && diff != 0f)
+            {
+                prevVal[$"{text}_x"] = diff;
+            }
             //if (logX) Mod.log.Info($"{multipler - prevMultiplierValue}x for {text}");
         }
 
