@@ -12,7 +12,7 @@ namespace SmartUpkeepManager
         public static readonly int SnowPloughing = 2000;
         public static readonly int Towing = 3000;
         public static readonly int RoadMaintenanceVehicle = 800;
-        
+
         // Electricity
         public static readonly int SolarPowered = 5;
         public static readonly int GroundWaterPowered = 10;
@@ -37,8 +37,8 @@ namespace SmartUpkeepManager
         public static readonly int HealthRange = 250;
         public static readonly int Treatment = 10000;
         public static readonly int Hearse = 1000;
-        public static readonly int BodyStorage = 500;
-        public static readonly int BodyProcessing = 500;
+        public static readonly int BodyStorage = 100;
+        public static readonly int BodyProcessing = 100;
 
         // Garbage Management
         public static readonly int GarbageCap = 20;
@@ -86,13 +86,15 @@ namespace SmartUpkeepManager
         public static readonly int Taxi = 500;
         public static readonly int Tram = 1000;
         public static readonly int Ship = 20000;
+
         //public static readonly int Post = 500;
         //public static readonly int Helicopter = 10000;
         public static readonly int Airplane = 15000;
         public static readonly int Subway = 3000;
         public static readonly int Rocket = 50000;
-        public static readonly int EnergyFuel = 5000;
-        public static readonly int EnergyElectricity = 8000;
+        public static readonly int EnergyFuel = 1000;
+        public static readonly int EnergyElectricity = 3000;
+
         //public static readonly int ProductionBoost = 1000;
         public static readonly int MaintenanceBoost = 2000;
         public static readonly int DispatchCenter = 500;
@@ -141,7 +143,8 @@ namespace SmartUpkeepManager
 
     public partial class Setting : ModSetting
     {
-        public Setting(IMod mod) : base(mod)
+        public Setting(IMod mod)
+            : base(mod)
         {
             SetDefaults();
         }
@@ -275,7 +278,7 @@ namespace SmartUpkeepManager
             VerboseLogging = true;
 #else
             VerboseLogging = false;
-#endif      
+#endif
             ParkingSpots = 0;
             RoadMaintenance = 0;
             SnowPloughing = 0;

@@ -1,33 +1,29 @@
 ﻿<Publish>
-	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
-	<ModId Value="" />
-	<!--Name of the mod to display to players-->
-	<DisplayName Value="SmarterBalancedUpkeep" />
-	<!--Short description of the mod-->
-	<ShortDescription Value="This is a short description" />
-	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
-	<!--LongDescription Value="This is a long description" /-->
+	<ModId Value="0" />
+	<DisplayName Value="Smart Upkeep Manager" />
+	<ShortDescription Value="A mod to dynamically adjust service building upkeep according to a predefined rate." />
 	<LongDescription>
-This is a long description
+# Smart Upkeep Manager
+Get balanced upkeep cost for all service buildings dependant on various functions provided by the building.
+
+Each factor is manually set with a predefined default value, but it's also possible to change every factors rates.
+All values can also be set to 0 too, making all upkeep free.
+
+# All options are optional.
+
+If you think some values are very out of balance and just changing the sliders won't make difference, feel free to reach out.
+
+- Does not modify the save itself. Removing the mod will revert everything back to vanilla.
 	</LongDescription>
-	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
-	<!--Screenshot, can be set multiple times-->
-	<Screenshot Value="" />
-	<!--Tag, can be set multiple times-->
-	<Tag Value="" />
-	<!--Link to the forum post where the mod can be discussed-->
+	<Screenshot Value="Properties/Screenshot01.png" />
+	<Tag Value="Code Mod" />
 	<ForumLink Value="" />
-	<!--Version of the mod-->
-	<ModVersion Value="1.0" />
-	<!--Recommended version of the base game to use the mod-->
-	<GameVersion Value="1.0.*" />
-	<!--Dependency for the mod, can be set multiple times-->
+	<ModVersion Value="1.0.2" />
+	<GameVersion Value="1.2.*" />
 	<Dependency Id="" />
-	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="" />
-	<!--ChangeLog>
-	</ChangeLog-->
-	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
-	<ExternalLink Type="" Url="" />
+	<ChangeLog>
+	</ChangeLog>
+	<ExternalLink Type="buymeacoffee" Url="https://www.buymeacoffee.com/starq" />
+	<ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1364334275767439370" />
 </Publish>

@@ -1,10 +1,10 @@
-﻿using Colossal.IO.AssetDatabase;
+﻿using System;
+using System.Collections.Generic;
+using Colossal.IO.AssetDatabase;
 using Game.Modding;
 using Game.Settings;
 using Game.UI;
 using SmartUpkeepManager.Systems;
-using System;
-using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine.Device;
 
@@ -12,11 +12,40 @@ namespace SmartUpkeepManager
 {
     [FileLocation("ModsSettings\\StarQ\\" + nameof(SmartUpkeepManager))]
     [SettingsUITabOrder(Page1, Page2, Page3, AboutTab)]
-    [SettingsUIGroupOrder(Buttons, General, Roads, Electricity, Water, Health, Garbage, Education, Fire, Police, Transportation, Parks, Communication, InfoGroup)]
-    [SettingsUIShowGroupName(General, Roads, Electricity, Water, Health, Garbage, Education, Fire, Police, Transportation, Parks, Communication)]
+    [SettingsUIGroupOrder(
+        Buttons,
+        General,
+        Roads,
+        Electricity,
+        Water,
+        Health,
+        Garbage,
+        Education,
+        Fire,
+        Police,
+        Transportation,
+        Parks,
+        Communication,
+        InfoGroup
+    )]
+    [SettingsUIShowGroupName(
+        General,
+        Roads,
+        Electricity,
+        Water,
+        Health,
+        Garbage,
+        Education,
+        Fire,
+        Police,
+        Transportation,
+        Parks,
+        Communication
+    )]
     public partial class Setting : ModSetting
     {
-        private static readonly SmartUpkeepSystem suS = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<SmartUpkeepSystem>();
+        private static readonly SmartUpkeepSystem suS =
+            World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<SmartUpkeepSystem>();
 
         public const string Page1 = "Page 1";
         public const string Page2 = "Page 2";
@@ -49,30 +78,21 @@ namespace SmartUpkeepManager
         [SettingsUISection(Page1, Buttons)]
         public bool SaveButton
         {
-            set
-            {
-                Save();
-            }
+            set { Save(); }
         }
 
         [SettingsUIButtonGroup("Options")]
         [SettingsUISection(Page1, Buttons)]
         public bool ModDefault
         {
-            set
-            {
-                SetDefaults();
-            }
+            set { SetDefaults(); }
         }
 
         [SettingsUIButtonGroup("Options")]
         [SettingsUISection(Page1, Buttons)]
         public bool MakeFree
         {
-            set
-            {
-                SetFree();
-            }
+            set { SetFree(); }
         }
 
         private readonly Dictionary<string, object> _values = new();
@@ -88,7 +108,9 @@ namespace SmartUpkeepManager
                 }
                 catch (InvalidCastException)
                 {
-                    Mod.log.Info($"Warning: Unable to cast setting '{propertyName}' to {typeof(T)}. Returning default.");
+                    Mod.log.Info(
+                        $"Warning: Unable to cast setting '{propertyName}' to {typeof(T)}. Returning default."
+                    );
                 }
             }
             return defaultValue;
@@ -116,7 +138,13 @@ namespace SmartUpkeepManager
         // Roads
         [SettingsUISection(Page1, Roads)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int RoadMaintenance
         {
             get => GetValue(nameof(RoadMaintenance), Defaults.RoadMaintenance);
@@ -125,7 +153,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Roads)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int SnowPloughing
         {
             get => GetValue(nameof(SnowPloughing), Defaults.SnowPloughing);
@@ -134,7 +168,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Roads)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Towing
         {
             get => GetValue(nameof(Towing), Defaults.Towing);
@@ -143,7 +183,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Roads)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int RoadMaintenanceVehicle
         {
             get => GetValue(nameof(RoadMaintenanceVehicle), Defaults.RoadMaintenanceVehicle);
@@ -153,7 +199,13 @@ namespace SmartUpkeepManager
         // Electricity
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int SolarPowered
         {
             get => GetValue(nameof(SolarPowered), Defaults.SolarPowered);
@@ -162,7 +214,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GroundWaterPowered
         {
             get => GetValue(nameof(GroundWaterPowered), Defaults.GroundWaterPowered);
@@ -171,7 +229,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int WaterPowered
         {
             get => GetValue(nameof(WaterPowered), Defaults.WaterPowered);
@@ -180,7 +244,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int WindPowered
         {
             get => GetValue(nameof(WindPowered), Defaults.WindPowered);
@@ -189,7 +259,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GarbagePowered
         {
             get => GetValue(nameof(GarbagePowered), Defaults.GarbagePowered);
@@ -198,7 +274,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ElectricityProduction
         {
             get => GetValue(nameof(ElectricityProduction), Defaults.ElectricityProduction);
@@ -207,7 +289,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int BatteryOut
         {
             get => GetValue(nameof(BatteryOut), Defaults.BatteryOut);
@@ -216,7 +304,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int BatteryCap
         {
             get => GetValue(nameof(BatteryCap), Defaults.BatteryCap);
@@ -225,7 +319,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Electricity)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Transformer
         {
             get => GetValue(nameof(Transformer), Defaults.Transformer);
@@ -235,7 +335,13 @@ namespace SmartUpkeepManager
         //Water & Sewage
         [SettingsUISection(Page1, Water)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 500, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 500,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int WaterPumpCap
         {
             get => GetValue(nameof(WaterPumpCap), Defaults.WaterPumpCap);
@@ -244,7 +350,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Water)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 500, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 500,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int SewageOutCap
         {
             get => GetValue(nameof(SewageOutCap), Defaults.SewageOutCap);
@@ -253,7 +365,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Water)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 30000, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 30000,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Purification
         {
             get => GetValue(nameof(Purification), Defaults.Purification);
@@ -263,7 +381,13 @@ namespace SmartUpkeepManager
         //Healthcare & Deathcare
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Ambulance
         {
             get => GetValue(nameof(Ambulance), Defaults.Ambulance);
@@ -272,7 +396,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int MedicalHelicopter
         {
             get => GetValue(nameof(MedicalHelicopter), Defaults.MedicalHelicopter);
@@ -281,7 +411,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Patient
         {
             get => GetValue(nameof(Patient), Defaults.Patient);
@@ -290,7 +426,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 3000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int HealthBonus
         {
             get => GetValue(nameof(HealthBonus), Defaults.HealthBonus);
@@ -299,7 +441,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 250, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 250,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int HealthRange
         {
             get => GetValue(nameof(HealthRange), Defaults.HealthRange);
@@ -308,7 +456,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100000, step = 10000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100000,
+            step = 10000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Treatment
         {
             get => GetValue(nameof(Treatment), Defaults.Treatment);
@@ -317,7 +471,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Hearse
         {
             get => GetValue(nameof(Hearse), Defaults.Hearse);
@@ -326,7 +486,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 2000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int BodyStorage
         {
             get => GetValue(nameof(BodyStorage), Defaults.BodyStorage);
@@ -335,7 +501,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Health)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 2000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int BodyProcessing
         {
             get => GetValue(nameof(BodyProcessing), Defaults.BodyProcessing);
@@ -345,7 +517,13 @@ namespace SmartUpkeepManager
         // Garbage Management
         [SettingsUISection(Page1, Garbage)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 500, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 500,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GarbageCap
         {
             get => GetValue(nameof(GarbageCap), Defaults.GarbageCap);
@@ -354,7 +532,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Garbage)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GarbageTruck
         {
             get => GetValue(nameof(GarbageTruck), Defaults.GarbageTruck);
@@ -363,7 +547,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Garbage)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int DumpTruck
         {
             get => GetValue(nameof(DumpTruck), Defaults.DumpTruck);
@@ -372,7 +562,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Garbage)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GarbageProcessing
         {
             get => GetValue(nameof(GarbageProcessing), Defaults.GarbageProcessing);
@@ -409,7 +605,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100,
+            step = 1,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Student
         {
             get => GetValue(nameof(Student), Defaults.Student);
@@ -418,7 +620,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int StudentGraduation
         {
             get => GetValue(nameof(StudentGraduation), Defaults.StudentGraduation);
@@ -427,7 +635,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int StudentWellbeing
         {
             get => GetValue(nameof(StudentWellbeing), Defaults.StudentWellbeing);
@@ -436,7 +650,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int StudentHealth
         {
             get => GetValue(nameof(StudentHealth), Defaults.StudentHealth);
@@ -445,7 +665,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Education)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ResearchFacility
         {
             get => GetValue(nameof(ResearchFacility), Defaults.ResearchFacility);
@@ -455,7 +681,13 @@ namespace SmartUpkeepManager
         // Fire & Rescue
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int FireTruck
         {
             get => GetValue(nameof(FireTruck), Defaults.FireTruck);
@@ -464,7 +696,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int FireHelicopter
         {
             get => GetValue(nameof(FireHelicopter), Defaults.FireHelicopter);
@@ -473,7 +711,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int FireDisasterCap
         {
             get => GetValue(nameof(FireDisasterCap), Defaults.FireDisasterCap);
@@ -482,7 +726,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 500, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int FireVehicleEffi
         {
             get => GetValue(nameof(FireVehicleEffi), Defaults.FireVehicleEffi);
@@ -491,7 +741,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 500, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 20000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Firewatch
         {
             get => GetValue(nameof(Firewatch), Defaults.Firewatch);
@@ -500,16 +756,29 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 30000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 30000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EarlyDisasterWarningSystem
         {
-            get => GetValue(nameof(EarlyDisasterWarningSystem), Defaults.EarlyDisasterWarningSystem);
+            get =>
+                GetValue(nameof(EarlyDisasterWarningSystem), Defaults.EarlyDisasterWarningSystem);
             set => SetValue(nameof(EarlyDisasterWarningSystem), value, Save);
         }
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int DisasterFacility
         {
             get => GetValue(nameof(DisasterFacility), Defaults.DisasterFacility);
@@ -518,7 +787,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ShelterCap
         {
             get => GetValue(nameof(ShelterCap), Defaults.ShelterCap);
@@ -527,7 +802,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EvacuationBus
         {
             get => GetValue(nameof(EvacuationBus), Defaults.EvacuationBus);
@@ -536,7 +817,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Fire)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EmergencyGenerator
         {
             get => GetValue(nameof(EmergencyGenerator), Defaults.EmergencyGenerator);
@@ -546,7 +833,13 @@ namespace SmartUpkeepManager
         // Police & Administration
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PatrolCar
         {
             get => GetValue(nameof(PatrolCar), Defaults.PatrolCar);
@@ -555,7 +848,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PoliceHelicopter
         {
             get => GetValue(nameof(PoliceHelicopter), Defaults.PoliceHelicopter);
@@ -564,7 +863,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LocalJail
         {
             get => GetValue(nameof(LocalJail), Defaults.LocalJail);
@@ -573,7 +878,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Patrol
         {
             get => GetValue(nameof(Patrol), Defaults.Patrol);
@@ -582,7 +893,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EmergencyPolice
         {
             get => GetValue(nameof(EmergencyPolice), Defaults.EmergencyPolice);
@@ -591,7 +908,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Intelligence
         {
             get => GetValue(nameof(Intelligence), Defaults.Intelligence);
@@ -600,7 +923,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PrisonVan
         {
             get => GetValue(nameof(PrisonVan), Defaults.PrisonVan);
@@ -609,7 +938,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PrisonerCap
         {
             get => GetValue(nameof(PrisonerCap), Defaults.PrisonerCap);
@@ -618,7 +953,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PrisonerWellbeing
         {
             get => GetValue(nameof(PrisonerWellbeing), Defaults.PrisonerWellbeing);
@@ -627,7 +968,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PrisonerHealth
         {
             get => GetValue(nameof(PrisonerHealth), Defaults.PrisonerHealth);
@@ -636,7 +983,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int WelfareOffice
         {
             get => GetValue(nameof(WelfareOffice), Defaults.WelfareOffice);
@@ -645,7 +998,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page2, Police)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int AdminBuilding
         {
             get => GetValue(nameof(AdminBuilding), Defaults.AdminBuilding);
@@ -655,7 +1014,13 @@ namespace SmartUpkeepManager
         // Transportation
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PlatformMaintenance
         {
             get => GetValue(nameof(PlatformMaintenance), Defaults.PlatformMaintenance);
@@ -664,7 +1029,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Bus
         {
             get => GetValue(nameof(Bus), Defaults.Bus);
@@ -673,7 +1044,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 20000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Train
         {
             get => GetValue(nameof(Train), Defaults.Train);
@@ -682,7 +1059,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Taxi
         {
             get => GetValue(nameof(Taxi), Defaults.Taxi);
@@ -691,7 +1074,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 20000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Tram
         {
             get => GetValue(nameof(Tram), Defaults.Tram);
@@ -700,7 +1089,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Ship
         {
             get => GetValue(nameof(Ship), Defaults.Ship);
@@ -728,7 +1123,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Airplane
         {
             get => GetValue(nameof(Airplane), Defaults.Airplane);
@@ -737,7 +1138,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 20000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Subway
         {
             get => GetValue(nameof(Subway), Defaults.Subway);
@@ -746,7 +1153,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100000, step = 5000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100000,
+            step = 5000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Rocket
         {
             get => GetValue(nameof(Rocket), Defaults.Rocket);
@@ -755,7 +1168,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EnergyFuel
         {
             get => GetValue(nameof(EnergyFuel), Defaults.EnergyFuel);
@@ -764,7 +1183,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EnergyElectricity
         {
             get => GetValue(nameof(EnergyElectricity), Defaults.EnergyElectricity);
@@ -783,7 +1208,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int MaintenanceBoost
         {
             get => GetValue(nameof(MaintenanceBoost), Defaults.MaintenanceBoost);
@@ -792,7 +1223,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int DispatchCenter
         {
             get => GetValue(nameof(DispatchCenter), Defaults.DispatchCenter);
@@ -801,7 +1238,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int TradedResource
         {
             get => GetValue(nameof(TradedResource), Defaults.TradedResource);
@@ -810,7 +1253,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int DeliveryTruck
         {
             get => GetValue(nameof(DeliveryTruck), Defaults.DeliveryTruck);
@@ -819,7 +1268,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Transportation)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100, step = 1, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ComfortFactor
         {
             get => GetValue(nameof(ComfortFactor), Defaults.ComfortFactor);
@@ -829,7 +1284,13 @@ namespace SmartUpkeepManager
         // Parks & Recreation
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 30000, step = 500, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 30000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ParkMaintenance
         {
             get => GetValue(nameof(ParkMaintenance), Defaults.ParkMaintenance);
@@ -838,7 +1299,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ParkMaintenanceVehicle
         {
             get => GetValue(nameof(ParkMaintenanceVehicle), Defaults.ParkMaintenanceVehicle);
@@ -847,7 +1314,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureEfficieny
         {
             get => GetValue(nameof(LeisureEfficieny), Defaults.LeisureEfficieny);
@@ -856,7 +1329,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureMeals
         {
             get => GetValue(nameof(LeisureMeals), Defaults.LeisureMeals);
@@ -865,7 +1344,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureEntertainment
         {
             get => GetValue(nameof(LeisureEntertainment), Defaults.LeisureEntertainment);
@@ -874,7 +1359,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureCommercial
         {
             get => GetValue(nameof(LeisureCommercial), Defaults.LeisureCommercial);
@@ -883,7 +1374,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureCityIndoors
         {
             get => GetValue(nameof(LeisureCityIndoors), Defaults.LeisureCityIndoors);
@@ -892,7 +1389,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureTravel
         {
             get => GetValue(nameof(LeisureTravel), Defaults.LeisureTravel);
@@ -901,7 +1404,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureCityPark
         {
             get => GetValue(nameof(LeisureCityPark), Defaults.LeisureCityPark);
@@ -910,7 +1419,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureCityBeach
         {
             get => GetValue(nameof(LeisureCityBeach), Defaults.LeisureCityBeach);
@@ -919,7 +1434,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureAttractions
         {
             get => GetValue(nameof(LeisureAttractions), Defaults.LeisureAttractions);
@@ -928,7 +1449,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureRelaxation
         {
             get => GetValue(nameof(LeisureRelaxation), Defaults.LeisureRelaxation);
@@ -937,16 +1464,28 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int LeisureSightseeing
         {
             get => GetValue(nameof(LeisureSightseeing), Defaults.LeisureSightseeing);
             set => SetValue(nameof(LeisureSightseeing), value, Save);
         }
-        
+
         [SettingsUISection(Page3, Parks)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Attraction
         {
             get => GetValue(nameof(Attraction), Defaults.Attraction);
@@ -956,7 +1495,13 @@ namespace SmartUpkeepManager
         // Communication
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PostVan
         {
             get => GetValue(nameof(PostVan), Defaults.PostVan);
@@ -965,7 +1510,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PostTruck
         {
             get => GetValue(nameof(PostTruck), Defaults.PostTruck);
@@ -974,7 +1525,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 200, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 200,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int MailCap
         {
             get => GetValue(nameof(MailCap), Defaults.MailCap);
@@ -983,7 +1540,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int PostSortingRate
         {
             get => GetValue(nameof(PostSortingRate), Defaults.PostSortingRate);
@@ -992,7 +1555,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 15000, step = 1000, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 15000,
+            step = 1000,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int TelecomRange
         {
             get => GetValue(nameof(TelecomRange), Defaults.TelecomRange);
@@ -1001,7 +1570,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 2000, step = 50, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 2000,
+            step = 50,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int NetworkCap
         {
             get => GetValue(nameof(NetworkCap), Defaults.NetworkCap);
@@ -1010,7 +1585,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 20000, step = 500, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 20000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Wireless
         {
             get => GetValue(nameof(Wireless), Defaults.Wireless);
@@ -1019,7 +1600,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Communication)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 50000, step = 500, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 50000,
+            step = 500,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int Fibre
         {
             get => GetValue(nameof(Fibre), Defaults.Fibre);
@@ -1032,7 +1619,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100, step = 2, scalarMultiplier = 1, unit = Unit.kPercentage)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100,
+            step = 2,
+            scalarMultiplier = 1,
+            unit = Unit.kPercentage
+        )]
         public bool ServiceBudgetMultiplier
         {
             get => GetValue(nameof(ServiceBudgetMultiplier), true);
@@ -1041,7 +1634,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100, step = 2, scalarMultiplier = 1, unit = Unit.kPercentage)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100,
+            step = 2,
+            scalarMultiplier = 1,
+            unit = Unit.kPercentage
+        )]
         public bool CityBonusMultiplier
         {
             get => GetValue(nameof(CityBonusMultiplier), true);
@@ -1050,7 +1649,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 100, scalarMultiplier = 1, unit = Unit.kPercentage)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kPercentage
+        )]
         public int ServiceCoverageMultiplier
         {
             get => GetValue(nameof(ServiceCoverageMultiplier), Defaults.ServiceCoverageMultiplier);
@@ -1059,7 +1664,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerCell)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerCell
+        )]
         public int PlotPrice
         {
             get => GetValue(nameof(PlotPrice), Defaults.PlotPrice);
@@ -1068,7 +1679,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, Roads)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 500, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 500,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int ParkingSpots
         {
             get => GetValue(nameof(ParkingSpots), Defaults.ParkingSpots);
@@ -1077,7 +1694,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int GroundPollution
         {
             get => GetValue(nameof(GroundPollution), Defaults.GroundPollution);
@@ -1086,7 +1709,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int AirPollution
         {
             get => GetValue(nameof(AirPollution), Defaults.AirPollution);
@@ -1095,7 +1724,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 10000, step = 100, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 10000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int NoisePollution
         {
             get => GetValue(nameof(NoisePollution), Defaults.NoisePollution);
@@ -1104,7 +1739,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 1000, step = 10, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 1000,
+            step = 10,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int EmployeeUpkeep
         {
             get => GetValue(nameof(EmployeeUpkeep), Defaults.EmployeeUpkeep);
@@ -1113,7 +1754,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = Unit.kMoneyPerMonth)]
+        [SettingsUISlider(
+            min = 0,
+            max = 100,
+            step = 5,
+            scalarMultiplier = 1,
+            unit = Unit.kMoneyPerMonth
+        )]
         public int StorageUpkeep
         {
             get => GetValue(nameof(StorageUpkeep), Defaults.StorageUpkeep);
@@ -1122,7 +1769,13 @@ namespace SmartUpkeepManager
 
         [SettingsUISection(Page1, General)]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(Disable), false)]
-        [SettingsUISlider(min = 100, max = 5000, step = 100, scalarMultiplier = 1, unit = Unit.kPercentage)]
+        [SettingsUISlider(
+            min = 100,
+            max = 5000,
+            step = 100,
+            scalarMultiplier = 1,
+            unit = Unit.kPercentage
+        )]
         public int Uniqueness
         {
             get => GetValue(nameof(Uniqueness), Defaults.Uniqueness);

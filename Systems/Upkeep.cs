@@ -1,10 +1,10 @@
-﻿using Colossal.Entities;
-using Colossal.Serialization.Entities;
-using Game.Prefabs;
-using Game;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using Colossal.Entities;
+using Colossal.Serialization.Entities;
+using Game;
+using Game.Prefabs;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -19,6 +19,7 @@ namespace SmartUpkeepManager.Systems
         public static readonly Dictionary<ServicePrefab, Entity> serviceDict = new();
         public static readonly Dictionary<string, int> ogUpkeep = new();
         public static readonly Dictionary<string, float> prevVal = new();
+
         //public static List<string> comps = new();
         //public static List<string> toRemove = new();
         public static bool systemActive = false;
@@ -50,11 +51,13 @@ namespace SmartUpkeepManager.Systems
 
         public void CollectDataForSUM()
         {
-            Mod.log.Info("Prefab Data collection started");
-            if (systemActive && buildingDict.Count != 0) return;
+            //Mod.log.Info("Prefab Data collection started");
+            if (systemActive && buildingDict.Count != 0)
+                return;
             try
             {
-                buildingQuery = SystemAPI.QueryBuilder()
+                buildingQuery = SystemAPI
+                    .QueryBuilder()
                     //.WithAny<SolarPoweredData, GroundWaterPoweredData, WaterPoweredData, WindPoweredData, PowerPlantData, BatteryData, TransformerData>()
                     //.WithAny<HospitalData>()
                     //.WithAny<FireStationData, FirewatchTowerData>()
@@ -62,7 +65,12 @@ namespace SmartUpkeepManager.Systems
                     //.WithAny<MaintenanceDepotData>()
                     //.WithAny<CoverageData, WorkplaceData, StorageLimitData, PollutionData, UniqueObjectData, ServiceObjectData>()
                     .WithAny<BuildingData, BuildingExtensionData>()
-                    .WithNone<SpawnableBuildingData, SignatureBuildingData, ExtractorFacilityData, PlaceholderBuildingData>()
+                    .WithNone<
+                        SpawnableBuildingData,
+                        SignatureBuildingData,
+                        ExtractorFacilityData,
+                        PlaceholderBuildingData
+                    >()
                     .Build();
                 var entities = buildingQuery.ToEntityArray(Allocator.Temp);
                 foreach (Entity entity in entities)
@@ -70,17 +78,22 @@ namespace SmartUpkeepManager.Systems
                     string prefabName = prefabSystem.GetPrefabName(entity);
                     if (!buildingDict.ContainsKey(prefabName))
                     {
-
-                        if (EntityManager.TryGetComponent(entity, out PrefabData prefabData) && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase))
+                        if (
+                            EntityManager.TryGetComponent(entity, out PrefabData prefabData)
+                            && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
+                        )
                         {
-
-                            ServiceConsumption serviceConsumption = prefabBase.GetComponent<ServiceConsumption>();
+                            ServiceConsumption serviceConsumption =
+                                prefabBase.GetComponent<ServiceConsumption>();
                             if (serviceConsumption != null)
                             {
                                 buildingDict.Add(prefabName, entity);
-                                if (!ogUpkeep.ContainsKey(prefabName) && serviceConsumption.m_Upkeep > 0)
+                                if (
+                                    !ogUpkeep.ContainsKey(prefabName)
+                                    && serviceConsumption.m_Upkeep > 0
+                                )
                                     ogUpkeep.Add(prefabName, serviceConsumption.m_Upkeep);
-                                    //Mod.log.Info($"Collecting {prefabName}");
+                                //Mod.log.Info($"Collecting {prefabName}");
                             }
 
                             //foreach (var component in prefabBase.components)
@@ -119,7 +132,8 @@ namespace SmartUpkeepManager.Systems
         {
             //Mod.log.Info("OnGameLoadingComplete Start");
             base.OnGameLoadingComplete(purpose, mode);
-            if (buildingDict.Count == 0) CollectDataForSUM();
+            if (buildingDict.Count == 0)
+                CollectDataForSUM();
             if (GameModeExtensions.IsGame(mode))
             {
                 inGame = true;
@@ -139,9 +153,7 @@ namespace SmartUpkeepManager.Systems
             //Mod.log.Info("OnGameLoadingComplete End");
         }
 
-        protected override void OnUpdate()
-        {
-        }
+        protected override void OnUpdate() { }
 
         public void SetUpkeep()
         {
@@ -158,15 +170,20 @@ namespace SmartUpkeepManager.Systems
             {
                 CalculateUpkeep();
             }
-            catch (Exception ex) { Mod.log.Error(ex); }
-            if (log) Mod.log.Info("Update Complete!");
+            catch (Exception ex)
+            {
+                Mod.log.Error(ex);
+            }
+            if (log)
+                Mod.log.Info("Update Complete!");
         }
 
         public void RefreshBuffer(Entity entity, int amount)
         {
             try
             {
-                DynamicBuffer<ServiceUpkeepData> sudBuffer = EntityManager.GetBuffer<ServiceUpkeepData>(entity);
+                DynamicBuffer<ServiceUpkeepData> sudBuffer =
+                    EntityManager.GetBuffer<ServiceUpkeepData>(entity);
 
                 for (int i = 0; i < sudBuffer.Length; i++)
                 {
@@ -181,125 +198,125 @@ namespace SmartUpkeepManager.Systems
             catch (Exception) { }
         }
 
-//        protected override void OnDestroy()
-//        {
-//            base.OnDestroy();
-//#if DEBUG
-//            string[] toRxemove = {
-                
-//                // General
-//                //"ServiceCoverage",
-//                //"Workplace",
-//                //"Pollution",
-//                //"StorageLimit",
-//                //"UniqueObject",
-//                //"ServiceObject",
+        //        protected override void OnDestroy()
+        //        {
+        //            base.OnDestroy();
+        //#if DEBUG
+        //            string[] toRxemove = {
 
-//                //// Mixed
-//                //"MaintenanceDepot",
-//                //"ObjectSubObjects",
+        //                // General
+        //                //"ServiceCoverage",
+        //                //"Workplace",
+        //                //"Pollution",
+        //                //"StorageLimit",
+        //                //"UniqueObject",
+        //                //"ServiceObject",
 
-//                //// Roads
-//                //"ParkingFacility",
+        //                //// Mixed
+        //                //"MaintenanceDepot",
+        //                //"ObjectSubObjects",
 
-//                //// Electricity
-//                //"SolarPowered",
-//                //"GroundWaterPowered",
-//                //"WaterPowered",
-//                //"WindPowered",
-//                //"GarbagePowered",
-//                //"PowerPlant",
-//                //"Battery",
-//                //"Transformer",
-                
-//                ////Water & Sewage
-//                //"WaterPumpingStation",
-//                //"SewageOutlet",
+        //                //// Roads
+        //                //"ParkingFacility",
 
-//                ////Healthcare & Deathcare
-//                //"Hospital",
-//                //"DeathcareFacility",
-                
-//                //// Garbage Management
-//                //"GarbageFacility",
+        //                //// Electricity
+        //                //"SolarPowered",
+        //                //"GroundWaterPowered",
+        //                //"WaterPowered",
+        //                //"WindPowered",
+        //                //"GarbagePowered",
+        //                //"PowerPlant",
+        //                //"Battery",
+        //                //"Transformer",
 
-//                //// Education & Research
-//                //"School",
-//                //"ResearchFacility",
+        //                ////Water & Sewage
+        //                //"WaterPumpingStation",
+        //                //"SewageOutlet",
 
-//                //// Fire & Rescue
-//                //"FireStation",
-//                //"FirewatchTower",
-//                ////EarlyDisasterWarningSystem
-//                ////DisasterFacility
-//                ////EmergencyGenerator
-//                ////EmergencyShelter
+        //                ////Healthcare & Deathcare
+        //                //"Hospital",
+        //                //"DeathcareFacility",
 
-//                //// Police & Administration
-//                ////PoliceStation
-//                ////Prison
-//                ////WelfareOffice
-//                //"AdministrationBuilding",
+        //                //// Garbage Management
+        //                //"GarbageFacility",
 
-//                //// Transportation
-//                ////CargoTransportStation
-//                ////TransportDepot
-//                ////TransportStation
+        //                //// Education & Research
+        //                //"School",
+        //                //"ResearchFacility",
 
-//                //// Parks & Recreation
-//                ////Park
-//                ////LeisureProvider
-//                //"Attraction",
-                
-//                //// Communication
-//                ////PostFacility
-//                ////TelecomFacility
+        //                //// Fire & Rescue
+        //                //"FireStation",
+        //                //"FirewatchTower",
+        //                ////EarlyDisasterWarningSystem
+        //                ////DisasterFacility
+        //                ////EmergencyGenerator
+        //                ////EmergencyShelter
 
-//                // Ignore
-//                "AchievementFilter",
-//                "ActivityLocation",
-//                "AssetPackItem",
-//                "BuildingTerraformOverride",
-//                "ContentPrerequisite",
-//                "DefaultPolicies",
-//                "DestructibleObject",
-//                "EditorAssetCategoryOverride",
-//                "EffectSource",
-//                "FloatingObject",
-//                "InitialResources",
-//                "NetObject",
-//                "ObjectAchievementComponent",
-//                "ObjectSubAreas",
-//                "ObjectSubLanes",
-//                "ObjectSubNets",
-//                "ObsoleteIdentifiers",
-//                "PlaceableObject",
-//                "PlaceholderObject",
-//                "ResourceConsumer",
-//                "ResourceProducer",
-//                "ServiceFeeCollector",
-//                "ServiceUpgrade",
-//                "ShorelineObject",
-//                "SignatureBuilding",
-//                "SpawnableBuilding",
-//                "SpawnableObject",
-//                "StandingObject",
-//                "SubObjectDefaultProbability",
-//                "ThemeObject",
-//                "TrafficSpawner",
-//                "UIObject",
-//                "Unlockable",
-//                "UnlockOnBuild",
-//            };
-//            var x = toRemove.Union(toRxemove);
-//            comps.RemoveAll(x.Contains);
-//            comps.Sort();
-//            Mod.log.Info($"-------------");
-//            foreach (var item in comps)
-//            {
-//                Mod.log.Info(item.ToString());
-//            }
-//#endif
-//        }
+        //                //// Police & Administration
+        //                ////PoliceStation
+        //                ////Prison
+        //                ////WelfareOffice
+        //                //"AdministrationBuilding",
+
+        //                //// Transportation
+        //                ////CargoTransportStation
+        //                ////TransportDepot
+        //                ////TransportStation
+
+        //                //// Parks & Recreation
+        //                ////Park
+        //                ////LeisureProvider
+        //                //"Attraction",
+
+        //                //// Communication
+        //                ////PostFacility
+        //                ////TelecomFacility
+
+        //                // Ignore
+        //                "AchievementFilter",
+        //                "ActivityLocation",
+        //                "AssetPackItem",
+        //                "BuildingTerraformOverride",
+        //                "ContentPrerequisite",
+        //                "DefaultPolicies",
+        //                "DestructibleObject",
+        //                "EditorAssetCategoryOverride",
+        //                "EffectSource",
+        //                "FloatingObject",
+        //                "InitialResources",
+        //                "NetObject",
+        //                "ObjectAchievementComponent",
+        //                "ObjectSubAreas",
+        //                "ObjectSubLanes",
+        //                "ObjectSubNets",
+        //                "ObsoleteIdentifiers",
+        //                "PlaceableObject",
+        //                "PlaceholderObject",
+        //                "ResourceConsumer",
+        //                "ResourceProducer",
+        //                "ServiceFeeCollector",
+        //                "ServiceUpgrade",
+        //                "ShorelineObject",
+        //                "SignatureBuilding",
+        //                "SpawnableBuilding",
+        //                "SpawnableObject",
+        //                "StandingObject",
+        //                "SubObjectDefaultProbability",
+        //                "ThemeObject",
+        //                "TrafficSpawner",
+        //                "UIObject",
+        //                "Unlockable",
+        //                "UnlockOnBuild",
+        //            };
+        //            var x = toRemove.Union(toRxemove);
+        //            comps.RemoveAll(x.Contains);
+        //            comps.Sort();
+        //            Mod.log.Info($"-------------");
+        //            foreach (var item in comps)
+        //            {
+        //                Mod.log.Info(item.ToString());
+        //            }
+        //#endif
+        //        }
     }
 }

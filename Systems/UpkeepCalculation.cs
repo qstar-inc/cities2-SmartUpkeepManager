@@ -1,11 +1,11 @@
-﻿using Colossal.Entities;
-using Game.Prefabs;
+﻿using System;
+using System.Runtime.Remoting.Lifetime;
+using Colossal.Entities;
 using Game;
-using System;
+using Game.Prefabs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using System.Runtime.Remoting.Lifetime;
 
 namespace SmartUpkeepManager.Systems
 {
@@ -17,9 +17,16 @@ namespace SmartUpkeepManager.Systems
 #if DEBUG
             logX = true;
 #endif
-            EntityQuery serviceBudgetQuery = SystemAPI.QueryBuilder().WithAll<Game.Simulation.ServiceBudgetData>().Build();
+            EntityQuery serviceBudgetQuery = SystemAPI
+                .QueryBuilder()
+                .WithAll<Game.Simulation.ServiceBudgetData>()
+                .Build();
             Entity serviceBudgetEntity = serviceBudgetQuery.ToEntityArray(Allocator.Temp)[0];
-            EntityManager.TryGetBuffer(serviceBudgetEntity, true, out DynamicBuffer<Game.Simulation.ServiceBudgetData> serviceBudgetData);
+            EntityManager.TryGetBuffer(
+                serviceBudgetEntity,
+                true,
+                out DynamicBuffer<Game.Simulation.ServiceBudgetData> serviceBudgetData
+            );
 
             foreach (var item in buildingDict)
             {
@@ -35,59 +42,184 @@ namespace SmartUpkeepManager.Systems
 
                     //Mod.log.Info("============");
 
-                    if (EntityManager.TryGetComponent(entity, out PrefabData prefabData) && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase))
+                    if (
+                        EntityManager.TryGetComponent(entity, out PrefabData prefabData)
+                        && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
+                    )
                     {
-
-                        if (EntityManager.TryGetComponent(entity, out ConsumptionData consumptionData))
+                        if (
+                            EntityManager.TryGetComponent(
+                                entity,
+                                out ConsumptionData consumptionData
+                            )
+                        )
                         {
-
                             if (ogUpkeep.ContainsKey(name) && ogUpkeep[name] != 0)
                             {
                                 // Mixed
-                                MaintenanceDepot MaintenanceDepot = prefabBase.GetComponent<MaintenanceDepot>();
+                                MaintenanceDepot maintenanceDepot =
+                                    prefabBase.GetComponent<MaintenanceDepot>();
                                 CrossExamine("MaintenanceDepot");
-                                if (MaintenanceDepot != null)
+                                if (maintenanceDepot != null)
                                 {
-                                    if (MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Road))
+                                    if (
+                                        maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Road
+                                        )
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.RoadMaintenance, "RoadMaintenance");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.RoadMaintenance,
+                                            "RoadMaintenance"
+                                        );
                                     }
-                                    if (MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Snow))
+                                    if (
+                                        maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Snow
+                                        )
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.SnowPloughing, "SnowPloughing");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.SnowPloughing,
+                                            "SnowPloughing"
+                                        );
                                     }
-                                    if (MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Park))
+                                    if (
+                                        maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Park
+                                        )
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ParkMaintenance, "ParkMaintenance");
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ParkMaintenanceVehicle * MaintenanceDepot.m_VehicleCapacity, "ParkMaintenanceVehicle");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.ParkMaintenance,
+                                            "ParkMaintenance"
+                                        );
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.ParkMaintenanceVehicle
+                                                * maintenanceDepot.m_VehicleCapacity,
+                                            "ParkMaintenanceVehicle"
+                                        );
                                     }
-                                    if (MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Vehicle))
+                                    if (
+                                        maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Vehicle
+                                        )
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Towing, "Towing");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.Towing,
+                                            "Towing"
+                                        );
                                     }
-                                    if (MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Snow) || MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Road) || MaintenanceDepot.m_MaintenanceType.HasFlag(Game.Simulation.MaintenanceType.Vehicle))
+                                    if (
+                                        maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Snow
+                                        )
+                                        || maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Road
+                                        )
+                                        || maintenanceDepot.m_MaintenanceType.HasFlag(
+                                            Game.Simulation.MaintenanceType.Vehicle
+                                        )
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.RoadMaintenanceVehicle * MaintenanceDepot.m_VehicleCapacity, "RoadMaintenanceVehicle");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.RoadMaintenanceVehicle
+                                                * maintenanceDepot.m_VehicleCapacity,
+                                            "RoadMaintenanceVehicle"
+                                        );
                                     }
                                 }
 
-                                ObjectSubObjects ObjectSubObjects = prefabBase.GetComponent<ObjectSubObjects>();
+                                ObjectSubObjects objectSubObjects =
+                                    prefabBase.GetComponent<ObjectSubObjects>();
                                 CrossExamine("ObjectSubObjects");
-                                if (ObjectSubObjects != null)
+                                if (objectSubObjects != null)
                                 {
                                     int parkingSpaces = 0;
                                     int platforms = 0;
-                                    for (int i = 0; i < ObjectSubObjects.m_SubObjects.Length; i++)
+                                    for (int i = 0; i < objectSubObjects.m_SubObjects.Length; i++)
                                     {
-                                        ObjectSubObjectInfo ObjectSubObjectInfo = ObjectSubObjects.m_SubObjects[i];
-                                        string objName = ObjectSubObjectInfo.m_Object.name;
-                                        if (!objName.StartsWith("ParkingLot") && !objName.Contains("Decal0")) continue;
-                                        if (objName == "ParkingLotDecal01" || objName == "ParkingLotDiagonalDecal01" || objName == "ParkingLotDisabledDecal01" || objName == "ParkingLotElectricDecal01" || objName == "ParkingLotServiceDecal01") { parkingSpaces++; }
-                                        else if (objName == "ParkingLotDoubleDecal01" || objName == "ParkingLotDoubleDecal02" || objName == "ParkingLotDoubleServiceDecal01" || objName == "ParkingLotDoubleServiceDecal02") { parkingSpaces += 2; }
-                                        else if (objName == "ParkingLotDecal02" || objName == "ParkingLotDiagonalDecal02" || objName == "ParkingLotDisabledDecal02" || objName == "ParkingLotElectricDecal02" || objName == "ParkingLotServiceDecal02") { parkingSpaces += 3; }
-                                        else if (objName == "ParkingLotDecal03" || objName == "ParkingLotDiagonalDecal03" || objName == "ParkingLotServiceDecal03") { parkingSpaces += 5; }
-                                        else if (objName == "ParkingLotDecal04" || objName == "ParkingLotServiceDecal04") { parkingSpaces += 10; }
-                                        else if (objName.StartsWith("ParkingLot") && objName.Contains("Decal0"))
+                                        ObjectSubObjectInfo objectSubObjectInfo =
+                                            objectSubObjects.m_SubObjects[i];
+                                        if (
+                                            objectSubObjectInfo == null
+                                            || objectSubObjectInfo.m_Object == null
+                                        )
+                                            continue;
+                                        string objName = objectSubObjectInfo.m_Object.name;
+                                        if (
+                                            !objName.StartsWith("ParkingLot")
+                                            && !objName.Contains("Decal0")
+                                            && !objName.StartsWith("Integrated")
+                                        )
+                                            continue;
+                                        if (
+                                            objName == "ParkingLotDecal01"
+                                            || objName == "ParkingLotDiagonalDecal01"
+                                            || objName == "ParkingLotDisabledDecal01"
+                                            || objName == "ParkingLotElectricDecal01"
+                                            || objName == "ParkingLotServiceDecal01"
+                                        )
+                                        {
+                                            parkingSpaces++;
+                                        }
+                                        else if (
+                                            objName == "ParkingLotDoubleDecal01"
+                                            || objName == "ParkingLotDoubleDecal02"
+                                            || objName == "ParkingLotDoubleServiceDecal01"
+                                            || objName == "ParkingLotDoubleServiceDecal02"
+                                        )
+                                        {
+                                            parkingSpaces += 2;
+                                        }
+                                        else if (
+                                            objName == "ParkingLotDecal02"
+                                            || objName == "ParkingLotDiagonalDecal02"
+                                            || objName == "ParkingLotDisabledDecal02"
+                                            || objName == "ParkingLotElectricDecal02"
+                                            || objName == "ParkingLotServiceDecal02"
+                                        )
+                                        {
+                                            parkingSpaces += 3;
+                                        }
+                                        else if (
+                                            objName == "ParkingLotDecal03"
+                                            || objName == "ParkingLotDiagonalDecal03"
+                                            || objName == "ParkingLotServiceDecal03"
+                                        )
+                                        {
+                                            parkingSpaces += 5;
+                                        }
+                                        else if (
+                                            objName == "ParkingLotDecal04"
+                                            || objName == "ParkingLotServiceDecal04"
+                                        )
+                                        {
+                                            parkingSpaces += 10;
+                                        }
+                                        else if (
+                                            objName.StartsWith("ParkingLot")
+                                            && objName.Contains("Decal0")
+                                        )
                                         {
                                             parkingSpaces++;
                                         }
@@ -97,268 +229,669 @@ namespace SmartUpkeepManager.Systems
                                         }
                                     }
 
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ParkingSpots * parkingSpaces, "ParkingSpots");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PlatformMaintenance * platforms, "Platforms");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ParkingSpots * parkingSpaces,
+                                        "ParkingSpots"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PlatformMaintenance * platforms,
+                                        "Platforms"
+                                    );
                                 }
 
                                 // Roads
-                                ParkingFacility ParkingFacility = prefabBase.GetComponent<ParkingFacility>();
+                                ParkingFacility parkingFacility =
+                                    prefabBase.GetComponent<ParkingFacility>();
                                 CrossExamine("ParkingFacility");
-                                if (ParkingFacility != null)
+                                if (parkingFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ParkingSpots * ParkingFacility.m_GarageMarkerCapacity, "GarageMarker");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ParkingSpots
+                                            * parkingFacility.m_GarageMarkerCapacity,
+                                        "GarageMarker"
+                                    );
                                 }
 
                                 // Electricity
-                                SolarPowered SolarPowered = prefabBase.GetComponent<SolarPowered>();
+                                SolarPowered solarPowered = prefabBase.GetComponent<SolarPowered>();
                                 CrossExamine("SolarPowered");
-                                if (SolarPowered != null)
+                                if (solarPowered != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.SolarPowered * (SolarPowered.m_Production / 1000f), "SolarPowered");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.SolarPowered
+                                            * (solarPowered.m_Production / 1000f),
+                                        "SolarPowered"
+                                    );
                                 }
 
-                                GroundWaterPowered GroundWaterPowered = prefabBase.GetComponent<GroundWaterPowered>();
+                                GroundWaterPowered groundWaterPowered =
+                                    prefabBase.GetComponent<GroundWaterPowered>();
                                 CrossExamine("GroundWaterPowered");
-                                if (GroundWaterPowered != null)
+                                if (groundWaterPowered != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundWaterPowered * (GroundWaterPowered.m_Production / 1000f), "GroundWaterPowered");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.GroundWaterPowered
+                                            * (groundWaterPowered.m_Production / 1000f),
+                                        "GroundWaterPowered"
+                                    );
                                 }
 
-                                WaterPowered WaterPowered = prefabBase.GetComponent<WaterPowered>();
+                                WaterPowered waterPowered = prefabBase.GetComponent<WaterPowered>();
                                 CrossExamine("WaterPowered");
-                                if (WaterPowered != null)
+                                if (waterPowered != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.WaterPowered * (WaterPowered.m_CapacityFactor * WaterPowered.m_ProductionFactor) * 10, "WaterPowered");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.WaterPowered
+                                            * (
+                                                waterPowered.m_CapacityFactor
+                                                * waterPowered.m_ProductionFactor
+                                            )
+                                            * 10,
+                                        "WaterPowered"
+                                    );
                                 }
 
-                                WindPowered WindPowered = prefabBase.GetComponent<WindPowered>();
+                                WindPowered windPowered = prefabBase.GetComponent<WindPowered>();
                                 CrossExamine("WindPowered");
-                                if (WindPowered != null)
+                                if (windPowered != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.WindPowered * (WindPowered.m_Production / 1000f), "WindPowered");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.WindPowered
+                                            * (windPowered.m_Production / 1000f),
+                                        "WindPowered"
+                                    );
                                 }
 
-                                GarbagePowered GarbagePowered = prefabBase.GetComponent<GarbagePowered>();
+                                GarbagePowered gabagePowered =
+                                    prefabBase.GetComponent<GarbagePowered>();
                                 CrossExamine("GarbagePowered");
-                                if (GarbagePowered != null)
+                                if (gabagePowered != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GarbagePowered * GarbagePowered.m_ProductionPerUnit * (GarbagePowered.m_Capacity / 1000f), "GarbagePowered");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.GarbagePowered
+                                            * gabagePowered.m_ProductionPerUnit
+                                            * (gabagePowered.m_Capacity / 1000f),
+                                        "GarbagePowered"
+                                    );
                                 }
 
-                                PowerPlant PowerPlant = prefabBase.GetComponent<PowerPlant>();
+                                PowerPlant powerPlant = prefabBase.GetComponent<PowerPlant>();
                                 CrossExamine("PowerPlant");
-                                if (PowerPlant != null)
+                                if (powerPlant != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ElectricityProduction * (PowerPlant.m_ElectricityProduction / 1000f), "ElectricityProduction");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ElectricityProduction
+                                            * (powerPlant.m_ElectricityProduction / 1000f),
+                                        "ElectricityProduction"
+                                    );
                                 }
 
-                                Battery Battery = prefabBase.GetComponent<Battery>();
+                                Battery battery = prefabBase.GetComponent<Battery>();
                                 CrossExamine("Battery");
-                                if (Battery != null)
+                                if (battery != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.BatteryOut * (Battery.m_PowerOutput / 1000f), "BatteryOut");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.BatteryCap * (Battery.m_Capacity / 1000f), "BatteryCap");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.BatteryOut * (battery.m_PowerOutput / 1000f),
+                                        "BatteryOut"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.BatteryCap * (battery.m_Capacity / 1000f),
+                                        "BatteryCap"
+                                    );
                                 }
 
-                                Transformer Transformer = prefabBase.GetComponent<Transformer>();
+                                Transformer transformer = prefabBase.GetComponent<Transformer>();
                                 CrossExamine("Transformer");
-                                if (Transformer != null)
+                                if (transformer != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Transformer, "Transformer");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Transformer,
+                                        "Transformer"
+                                    );
                                 }
 
                                 //Water & Sewage
 
-                                WaterPumpingStation WaterPumpingStation = prefabBase.GetComponent<WaterPumpingStation>();
+                                WaterPumpingStation waterPumpingStation =
+                                    prefabBase.GetComponent<WaterPumpingStation>();
                                 CrossExamine("WaterPumpingStation");
-                                if (WaterPumpingStation != null)
+                                if (waterPumpingStation != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.WaterPumpCap * (WaterPumpingStation.m_Capacity / 1000f), "WaterPumpCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Purification * WaterPumpingStation.m_Purification, "WaterPurification");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.WaterPumpCap
+                                            * (waterPumpingStation.m_Capacity / 1000f),
+                                        "WaterPumpCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Purification
+                                            * waterPumpingStation.m_Purification,
+                                        "WaterPurification"
+                                    );
                                 }
 
-                                SewageOutlet SewageOutlet = prefabBase.GetComponent<SewageOutlet>();
+                                SewageOutlet sewageOutlet = prefabBase.GetComponent<SewageOutlet>();
                                 CrossExamine("SewageOutlet");
-                                if (SewageOutlet != null)
+                                if (sewageOutlet != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.SewageOutCap * (SewageOutlet.m_Capacity / 1000f), "SewageOutCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Purification * SewageOutlet.m_Purification, "SewagePurification");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.SewageOutCap
+                                            * (sewageOutlet.m_Capacity / 1000f),
+                                        "SewageOutCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Purification * sewageOutlet.m_Purification,
+                                        "SewagePurification"
+                                    );
                                 }
 
                                 //Healthcare & Deathcare
-                                Hospital Hospital = prefabBase.GetComponent<Hospital>();
+                                Hospital hospital = prefabBase.GetComponent<Hospital>();
                                 CrossExamine("Hospital");
-                                if (Hospital != null)
+                                if (hospital != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Ambulance * Hospital.m_AmbulanceCapacity, "Ambulance");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.MedicalHelicopter * Hospital.m_MedicalHelicopterCapacity, "MedicalHelicopter");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Patient * Hospital.m_PatientCapacity, "Patient");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Ambulance * hospital.m_AmbulanceCapacity,
+                                        "Ambulance"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.MedicalHelicopter
+                                            * hospital.m_MedicalHelicopterCapacity,
+                                        "MedicalHelicopter"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Patient * hospital.m_PatientCapacity,
+                                        "Patient"
+                                    );
                                     //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.HealthBonus * Hospital.m_TreatmentBonus, "HealthBonus");
 
-                                    float weightedX = SegmentedWeight(Hospital.m_HealthRange.x, Mod.m_Setting.HealthRange);
-                                    float weightedY = SegmentedWeight(Hospital.m_HealthRange.y, Mod.m_Setting.HealthRange);
+                                    float weightedX = SegmentedWeight(
+                                        hospital.m_HealthRange.x,
+                                        Mod.m_Setting.HealthRange
+                                    );
+                                    float weightedY = SegmentedWeight(
+                                        hospital.m_HealthRange.y,
+                                        Mod.m_Setting.HealthRange
+                                    );
 
                                     float extra = 0;
-                                    if (Hospital.m_TreatDiseases || Hospital.m_TreatInjuries)
+                                    if (hospital.m_TreatDiseases || hospital.m_TreatInjuries)
                                     {
-                                        if (Hospital.m_PatientCapacity > 0)
+                                        if (hospital.m_PatientCapacity > 0)
                                         {
-                                            extra = (Mod.m_Setting.Treatment / Hospital.m_PatientCapacity) * (Hospital.m_TreatmentBonus / Hospital.m_PatientCapacity);
-                                        } else
+                                            extra =
+                                                (
+                                                    Mod.m_Setting.Treatment
+                                                    / hospital.m_PatientCapacity
+                                                )
+                                                * (
+                                                    hospital.m_TreatmentBonus
+                                                    / hospital.m_PatientCapacity
+                                                );
+                                        }
+                                        else
                                         {
                                             extra = Mod.m_Setting.Treatment;
                                         }
-                                    } else
+                                    }
+                                    else
                                     {
-                                        if (Hospital.m_TreatmentBonus > 0)
+                                        if (hospital.m_TreatmentBonus > 0)
                                         {
                                             extra = Mod.m_Setting.HealthBonus;
                                         }
                                     }
-                                    var valx = ((Math.Abs(weightedX - weightedY) / Mod.m_Setting.HealthRange) / 100f) * extra;
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, valx, "HealthBonusRange");
+                                    var valx =
+                                        (
+                                            (
+                                                Math.Abs(weightedX - weightedY)
+                                                / Mod.m_Setting.HealthRange
+                                            ) / 100f
+                                        ) * extra;
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        valx,
+                                        "HealthBonusRange"
+                                    );
                                     //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatDiseases ? Mod.m_Setting.Treatment : 0f, "TreatDiseases");
                                     //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
                                 }
 
-                                DeathcareFacility DeathcareFacility = prefabBase.GetComponent<DeathcareFacility>();
+                                DeathcareFacility deathcareFacility =
+                                    prefabBase.GetComponent<DeathcareFacility>();
                                 CrossExamine("DeathcareFacility");
-                                if (DeathcareFacility != null)
+                                if (deathcareFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Hearse * DeathcareFacility.m_HearseCapacity, "Hearse");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.BodyStorage / 1000f) * DeathcareFacility.m_StorageCapacity * (DeathcareFacility.m_LongTermStorage ? 1f : 0.3f), "BodyStorage");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.BodyProcessing * DeathcareFacility.m_ProcessingRate, "BodyProcessing");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Hearse * deathcareFacility.m_HearseCapacity,
+                                        "Hearse"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        (Mod.m_Setting.BodyStorage / 100f)
+                                            * deathcareFacility.m_StorageCapacity
+                                            * (deathcareFacility.m_LongTermStorage ? 1f : 0.3f),
+                                        "BodyStorage"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.BodyProcessing
+                                            * deathcareFacility.m_ProcessingRate,
+                                        "BodyProcessing"
+                                    );
                                 }
 
                                 // Garbage Management
-                                GarbageFacility GarbageFacility = prefabBase.GetComponent<GarbageFacility>();
+                                GarbageFacility garbageFacility =
+                                    prefabBase.GetComponent<GarbageFacility>();
                                 CrossExamine("GarbageFacility");
-                                if (GarbageFacility != null)
+                                if (garbageFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GarbageTruck * GarbageFacility.m_VehicleCapacity, "GarbageTruck");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.DumpTruck * GarbageFacility.m_TransportCapacity, "DumpTruck");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageCap / 1000f) * GarbageFacility.m_GarbageCapacity * (GarbageFacility.m_LongTermStorage ? 1f : 0.3f) * (GarbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f), "GarbageCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (Mod.m_Setting.GarbageProcessing / 1000f) * (GarbageFacility.m_ProcessingSpeed / 1000f) * (GarbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f), "GarbageProcessing");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.GarbageTruck
+                                            * garbageFacility.m_VehicleCapacity,
+                                        "GarbageTruck"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.DumpTruck
+                                            * garbageFacility.m_TransportCapacity,
+                                        "DumpTruck"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        (Mod.m_Setting.GarbageCap / 1000f)
+                                            * garbageFacility.m_GarbageCapacity
+                                            * (garbageFacility.m_LongTermStorage ? 1f : 0.3f)
+                                            * (garbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f),
+                                        "GarbageCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        (Mod.m_Setting.GarbageProcessing / 1000f)
+                                            * (garbageFacility.m_ProcessingSpeed / 1000f)
+                                            * (garbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f),
+                                        "GarbageProcessing"
+                                    );
                                 }
 
                                 // Education & Research
-                                School School = prefabBase.GetComponent<School>();
+                                School school = prefabBase.GetComponent<School>();
                                 CrossExamine("School");
-                                if (School != null)
+                                if (school != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Student * School.m_StudentCapacity, $"Student_{School.m_Level}");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentGraduation * School.m_GraduationModifier * 100f, "StudentGraduation");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentWellbeing * School.m_StudentWellbeing, "StudentWellbeing");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StudentHealth * School.m_StudentHealth, "StudentHealth");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Student * school.m_StudentCapacity,
+                                        $"Student_{school.m_Level}"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.StudentGraduation
+                                            * school.m_GraduationModifier
+                                            * 100f,
+                                        "StudentGraduation"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.StudentWellbeing * school.m_StudentWellbeing,
+                                        "StudentWellbeing"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.StudentHealth * school.m_StudentHealth,
+                                        "StudentHealth"
+                                    );
                                 }
 
-                                ResearchFacility ResearchFacility = prefabBase.GetComponent<ResearchFacility>();
+                                ResearchFacility researchFacility =
+                                    prefabBase.GetComponent<ResearchFacility>();
                                 CrossExamine("ResearchFacility");
-                                if (ResearchFacility != null)
+                                if (researchFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ResearchFacility, "ResearchFacility");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ResearchFacility,
+                                        "ResearchFacility"
+                                    );
                                 }
 
                                 // Fire & Rescue
-                                FireStation FireStation = prefabBase.GetComponent<FireStation>();
+                                FireStation fireStation = prefabBase.GetComponent<FireStation>();
                                 CrossExamine("FireStation");
-                                if (FireStation != null)
+                                if (fireStation != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.FireTruck * FireStation.m_FireEngineCapacity, "FireTruck");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.FireHelicopter * FireStation.m_FireHelicopterCapacity, "FireHelicopter");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.FireDisasterCap * FireStation.m_DisasterResponseCapacity, "FireDisasterCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.FireVehicleEffi * FireStation.m_VehicleEfficiency, "FireVehicleEffi");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.FireTruck * fireStation.m_FireEngineCapacity,
+                                        "FireTruck"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.FireHelicopter
+                                            * fireStation.m_FireHelicopterCapacity,
+                                        "FireHelicopter"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.FireDisasterCap
+                                            * fireStation.m_DisasterResponseCapacity,
+                                        "FireDisasterCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.FireVehicleEffi
+                                            * fireStation.m_VehicleEfficiency,
+                                        "FireVehicleEffi"
+                                    );
                                 }
 
-                                FirewatchTower FirewatchTower = prefabBase.GetComponent<FirewatchTower>();
+                                FirewatchTower firewatchTower =
+                                    prefabBase.GetComponent<FirewatchTower>();
                                 CrossExamine("FirewatchTower");
-                                if (FirewatchTower != null)
+                                if (firewatchTower != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Firewatch, "Firewatch");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Firewatch,
+                                        "Firewatch"
+                                    );
                                 }
 
-                                EarlyDisasterWarningSystem EarlyDisasterWarningSystem = prefabBase.GetComponent<EarlyDisasterWarningSystem>();
+                                EarlyDisasterWarningSystem earlyDisasterWarningSystem =
+                                    prefabBase.GetComponent<EarlyDisasterWarningSystem>();
                                 CrossExamine("EarlyDisasterWarningSystem");
-                                if (EarlyDisasterWarningSystem != null)
+                                if (earlyDisasterWarningSystem != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EarlyDisasterWarningSystem, "EarlyDisasterWarningSystem");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.EarlyDisasterWarningSystem,
+                                        "EarlyDisasterWarningSystem"
+                                    );
                                 }
 
-                                DisasterFacility DisasterFacility = prefabBase.GetComponent<DisasterFacility>();
+                                DisasterFacility disasterFacility =
+                                    prefabBase.GetComponent<DisasterFacility>();
                                 CrossExamine("DisasterFacility");
-                                if (DisasterFacility != null)
+                                if (disasterFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.DisasterFacility, "DisasterFacility");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.DisasterFacility,
+                                        "DisasterFacility"
+                                    );
                                 }
 
-                                EmergencyShelter EmergencyShelter = prefabBase.GetComponent<EmergencyShelter>();
+                                EmergencyShelter emergencyShelter =
+                                    prefabBase.GetComponent<EmergencyShelter>();
                                 CrossExamine("EmergencyShelter");
-                                if (EmergencyShelter != null)
+                                if (emergencyShelter != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EvacuationBus * EmergencyShelter.m_VehicleCapacity, "EvacuationBus");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ShelterCap * EmergencyShelter.m_ShelterCapacity / 1000f, "ShelterCap");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.EvacuationBus
+                                            * emergencyShelter.m_VehicleCapacity,
+                                        "EvacuationBus"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ShelterCap
+                                            * emergencyShelter.m_ShelterCapacity
+                                            / 1000f,
+                                        "ShelterCap"
+                                    );
                                 }
 
-                                EmergencyGenerator EmergencyGenerator = prefabBase.GetComponent<EmergencyGenerator>();
+                                EmergencyGenerator emergencyGenerator =
+                                    prefabBase.GetComponent<EmergencyGenerator>();
                                 CrossExamine("EmergencyGenerator");
-                                if (EmergencyGenerator != null)
+                                if (emergencyGenerator != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EmergencyGenerator * (EmergencyGenerator.m_ElectricityProduction / 1000f), "EmergencyGenerator");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.EmergencyGenerator
+                                            * (emergencyGenerator.m_ElectricityProduction / 1000f),
+                                        "EmergencyGenerator"
+                                    );
                                 }
 
                                 // Police & Administration
-                                PoliceStation PoliceStation = prefabBase.GetComponent<PoliceStation>();
+                                PoliceStation policeStation =
+                                    prefabBase.GetComponent<PoliceStation>();
                                 CrossExamine("PoliceStation");
-                                if (PoliceStation != null)
+                                if (policeStation != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PatrolCar * PoliceStation.m_PatrolCarCapacity, "PatrolCar");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PoliceHelicopter * PoliceStation.m_PoliceHelicopterCapacity, "PoliceHelicopter");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.LocalJail * PoliceStation.m_JailCapacity, "LocalJail");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PatrolCar * policeStation.m_PatrolCarCapacity,
+                                        "PatrolCar"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PoliceHelicopter
+                                            * policeStation.m_PoliceHelicopterCapacity,
+                                        "PoliceHelicopter"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.LocalJail * policeStation.m_JailCapacity,
+                                        "LocalJail"
+                                    );
 
-                                    if (PoliceStation.m_Purposes.HasFlag(PolicePurpose.Patrol))
+                                    if (policeStation.m_Purposes.HasFlag(PolicePurpose.Patrol))
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Patrol, "Patrol");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.Patrol,
+                                            "Patrol"
+                                        );
                                     }
-                                    if (PoliceStation.m_Purposes.HasFlag(PolicePurpose.Emergency))
+                                    if (policeStation.m_Purposes.HasFlag(PolicePurpose.Emergency))
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EmergencyPolice, "Emergency");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.EmergencyPolice,
+                                            "Emergency"
+                                        );
                                     }
-                                    if (PoliceStation.m_Purposes.HasFlag(PolicePurpose.Intelligence))
+                                    if (
+                                        policeStation.m_Purposes.HasFlag(PolicePurpose.Intelligence)
+                                    )
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Intelligence, "Intelligence");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.Intelligence,
+                                            "Intelligence"
+                                        );
                                     }
                                 }
 
-                                Prison Prison = prefabBase.GetComponent<Prison>();
+                                Prison prison = prefabBase.GetComponent<Prison>();
                                 CrossExamine("Prison");
-                                if (Prison != null)
+                                if (prison != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PrisonVan * Prison.m_PrisonVanCapacity, "PrisonVan");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PrisonerCap * Prison.m_PrisonerCapacity, "PrisonerCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PrisonerWellbeing * Prison.m_PrisonerWellbeing, "PrisonerWellbeing");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PrisonerHealth * Prison.m_PrisonerHealth, "PrisonerHealth");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PrisonVan * prison.m_PrisonVanCapacity,
+                                        "PrisonVan"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PrisonerCap * prison.m_PrisonerCapacity,
+                                        "PrisonerCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PrisonerWellbeing
+                                            * prison.m_PrisonerWellbeing,
+                                        "PrisonerWellbeing"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PrisonerHealth * prison.m_PrisonerHealth,
+                                        "PrisonerHealth"
+                                    );
                                 }
 
-                                WelfareOffice WelfareOffice = prefabBase.GetComponent<WelfareOffice>();
+                                WelfareOffice welfareOffice =
+                                    prefabBase.GetComponent<WelfareOffice>();
                                 CrossExamine("WelfareOffice");
-                                if (WelfareOffice != null)
+                                if (welfareOffice != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.WelfareOffice, "WelfareOffice");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.WelfareOffice,
+                                        "WelfareOffice"
+                                    );
                                 }
 
-                                AdministrationBuilding AdministrationBuilding = prefabBase.GetComponent<AdministrationBuilding>();
+                                AdministrationBuilding administrationBuilding =
+                                    prefabBase.GetComponent<AdministrationBuilding>();
                                 CrossExamine("AdministrationBuilding");
-                                if (AdministrationBuilding != null)
+                                if (administrationBuilding != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AdminBuilding, "AdminBuilding");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.AdminBuilding,
+                                        "AdminBuilding"
+                                    );
                                 }
 
                                 // Transportation
-                                TransportDepot TransportDepot = prefabBase.GetComponent<TransportDepot>();
+                                TransportDepot transportDepot =
+                                    prefabBase.GetComponent<TransportDepot>();
                                 CrossExamine("TransportDepot");
-                                if (TransportDepot != null)
+                                if (transportDepot != null)
                                 {
-                                    TransportType transportType = TransportDepot.m_TransportType;
+                                    TransportType transportType = transportDepot.m_TransportType;
                                     float transportMuliplier = 0f;
                                     switch (transportType)
                                     {
@@ -393,9 +926,16 @@ namespace SmartUpkeepManager.Systems
                                             transportMuliplier = Mod.m_Setting.Rocket;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, transportMuliplier * TransportDepot.m_VehicleCapacity, $"TransportType_{transportType}");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        transportMuliplier * transportDepot.m_VehicleCapacity,
+                                        $"TransportType_{transportType}"
+                                    );
 
-                                    Game.Vehicles.EnergyTypes energyType = TransportDepot.m_EnergyTypes;
+                                    Game.Vehicles.EnergyTypes energyType =
+                                        transportDepot.m_EnergyTypes;
                                     float energyValue = 0f;
                                     switch (energyType)
                                     {
@@ -406,30 +946,73 @@ namespace SmartUpkeepManager.Systems
                                             energyValue = Mod.m_Setting.EnergyElectricity;
                                             break;
                                         case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                            energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                            energyValue =
+                                                Mod.m_Setting.EnergyFuel
+                                                + Mod.m_Setting.EnergyElectricity;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"EnergyTypes_{energyType}");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        energyValue,
+                                        $"EnergyTypes_{energyType}"
+                                    );
 
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Math.Max(Mod.m_Setting.MaintenanceBoost, Mod.m_Setting.MaintenanceBoost * (TransportDepot.m_MaintenanceDuration * 100f)), "MaintenanceBoost");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Math.Max(
+                                            Mod.m_Setting.MaintenanceBoost,
+                                            Mod.m_Setting.MaintenanceBoost
+                                                * (transportDepot.m_MaintenanceDuration * 100f)
+                                        ),
+                                        "MaintenanceBoost"
+                                    );
 
-                                    if (TransportDepot.m_DispatchCenter)
+                                    if (transportDepot.m_DispatchCenter)
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.DispatchCenter, "DispatchCenter");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            Mod.m_Setting.DispatchCenter,
+                                            "DispatchCenter"
+                                        );
                                     }
                                 }
 
-                                CargoTransportStation CargoTransportStation = prefabBase.GetComponent<CargoTransportStation>();
+                                CargoTransportStation cargoTransportStation =
+                                    prefabBase.GetComponent<CargoTransportStation>();
                                 CrossExamine("CargoTransportStation");
-                                if (CargoTransportStation != null)
+                                if (cargoTransportStation != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.TradedResource * CargoTransportStation.m_TradedResources.Length, "TradedResource");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.DeliveryTruck * CargoTransportStation.transports, "DeliveryTruck");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.TradedResource
+                                            * cargoTransportStation.m_TradedResources.Length,
+                                        "TradedResource"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.DeliveryTruck
+                                            * cargoTransportStation.transports,
+                                        "DeliveryTruck"
+                                    );
 
-                                    if (!CargoTransportStation.m_CarRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !cargoTransportStation.m_CarRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (CargoTransportStation.m_CarRefuelTypes)
+                                        switch (cargoTransportStation.m_CarRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -438,16 +1021,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes_{CargoTransportStation.m_CarRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"CarRefuelTypes_{cargoTransportStation.m_CarRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!CargoTransportStation.m_TrainRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !cargoTransportStation.m_TrainRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (CargoTransportStation.m_TrainRefuelTypes)
+                                        switch (cargoTransportStation.m_TrainRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -456,16 +1051,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes_{CargoTransportStation.m_TrainRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"TrainRefuelTypes_{cargoTransportStation.m_TrainRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!CargoTransportStation.m_WatercraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !cargoTransportStation.m_WatercraftRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (CargoTransportStation.m_WatercraftRefuelTypes)
+                                        switch (cargoTransportStation.m_WatercraftRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -474,16 +1081,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel_{CargoTransportStation.m_WatercraftRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"WatercraftRefuel_{cargoTransportStation.m_WatercraftRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!CargoTransportStation.m_AircraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !cargoTransportStation.m_AircraftRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (CargoTransportStation.m_AircraftRefuelTypes)
+                                        switch (cargoTransportStation.m_AircraftRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -492,21 +1111,34 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes_{CargoTransportStation.m_AircraftRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"AircraftRefuelTypes_{cargoTransportStation.m_AircraftRefuelTypes}"
+                                        );
                                     }
                                 }
 
-                                TransportStation TransportStation = prefabBase.GetComponent<TransportStation>();
+                                TransportStation transportStation =
+                                    prefabBase.GetComponent<TransportStation>();
                                 CrossExamine("TransportStation");
-                                if (TransportStation != null)
+                                if (transportStation != null)
                                 {
-                                    if (!TransportStation.m_CarRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !transportStation.m_CarRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (TransportStation.m_CarRefuelTypes)
+                                        switch (transportStation.m_CarRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -515,16 +1147,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"CarRefuelTypes_{TransportStation.m_CarRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"CarRefuelTypes_{transportStation.m_CarRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!TransportStation.m_TrainRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !transportStation.m_TrainRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (TransportStation.m_TrainRefuelTypes)
+                                        switch (transportStation.m_TrainRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -533,16 +1177,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"TrainRefuelTypes_{TransportStation.m_TrainRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"TrainRefuelTypes_{transportStation.m_TrainRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!TransportStation.m_WatercraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !transportStation.m_WatercraftRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (TransportStation.m_WatercraftRefuelTypes)
+                                        switch (transportStation.m_WatercraftRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -551,16 +1207,28 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"WatercraftRefuel_{TransportStation.m_WatercraftRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"WatercraftRefuel_{transportStation.m_WatercraftRefuelTypes}"
+                                        );
                                     }
 
-                                    if (!TransportStation.m_AircraftRefuelTypes.HasFlag(Game.Vehicles.EnergyTypes.None))
+                                    if (
+                                        !transportStation.m_AircraftRefuelTypes.HasFlag(
+                                            Game.Vehicles.EnergyTypes.None
+                                        )
+                                    )
                                     {
                                         float energyValue = 0f;
-                                        switch (TransportStation.m_AircraftRefuelTypes)
+                                        switch (transportStation.m_AircraftRefuelTypes)
                                         {
                                             case Game.Vehicles.EnergyTypes.Fuel:
                                                 energyValue = Mod.m_Setting.EnergyFuel;
@@ -569,21 +1237,39 @@ namespace SmartUpkeepManager.Systems
                                                 energyValue = Mod.m_Setting.EnergyElectricity;
                                                 break;
                                             case Game.Vehicles.EnergyTypes.FuelAndElectricity:
-                                                energyValue = Mod.m_Setting.EnergyFuel + Mod.m_Setting.EnergyElectricity;
+                                                energyValue =
+                                                    Mod.m_Setting.EnergyFuel
+                                                    + Mod.m_Setting.EnergyElectricity;
                                                 break;
                                         }
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, energyValue, $"AircraftRefuelTypes_{TransportStation.m_AircraftRefuelTypes}");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            energyValue,
+                                            $"AircraftRefuelTypes_{transportStation.m_AircraftRefuelTypes}"
+                                        );
                                     }
 
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ComfortFactor * TransportStation.m_ComfortFactor * 100f, "ComfortFactor");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ComfortFactor
+                                            * transportStation.m_ComfortFactor
+                                            * 100f,
+                                        "ComfortFactor"
+                                    );
                                 }
 
                                 // Parks & Recreation
-                                LeisureProvider LeisureProvider = prefabBase.GetComponent<LeisureProvider>();
+                                LeisureProvider leisureProvider =
+                                    prefabBase.GetComponent<LeisureProvider>();
                                 CrossExamine("LeisureProvider");
-                                if (LeisureProvider != null)
+                                if (leisureProvider != null)
                                 {
-                                    Game.Agents.LeisureType leisureType = LeisureProvider.m_LeisureType;
+                                    Game.Agents.LeisureType leisureType =
+                                        leisureProvider.m_LeisureType;
                                     float leisureMultiplier = 0f;
                                     switch (leisureType)
                                     {
@@ -618,105 +1304,271 @@ namespace SmartUpkeepManager.Systems
                                             leisureMultiplier = Mod.m_Setting.LeisureSightseeing;
                                             break;
                                     }
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, leisureMultiplier * (Mod.m_Setting.LeisureEfficieny * (LeisureProvider.m_Efficiency / 100f)), $"LeisureProvider_{LeisureProvider.m_LeisureType}");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        leisureMultiplier
+                                            * (
+                                                Mod.m_Setting.LeisureEfficieny
+                                                * (leisureProvider.m_Efficiency / 100f)
+                                            ),
+                                        $"LeisureProvider_{leisureProvider.m_LeisureType}"
+                                    );
                                 }
 
-                                Attraction Attraction = prefabBase.GetComponent<Attraction>();
+                                Attraction attraction = prefabBase.GetComponent<Attraction>();
                                 CrossExamine("Attraction");
-                                if (Attraction != null)
+                                if (attraction != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.Attraction * Attraction.m_Attractiveness, "Attraction");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.Attraction * attraction.m_Attractiveness,
+                                        "Attraction"
+                                    );
                                 }
 
                                 // Communication
-                                PostFacility PostFacility = prefabBase.GetComponent<PostFacility>();
+                                PostFacility postFacility = prefabBase.GetComponent<PostFacility>();
                                 CrossExamine("PostFacility");
-                                if (PostFacility != null)
+                                if (postFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PostVan * PostFacility.m_PostVanCapacity, "PostVan");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PostTruck * PostFacility.m_PostTruckCapacity, "PostTruck");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.MailCap * ((PostFacility.m_MailStorageCapacity + PostFacility.m_MailBoxCapacity) / 1000f), "MailCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.PostSortingRate * (PostFacility.m_SortingRate / 1000f), "PostSortingRate");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PostVan * postFacility.m_PostVanCapacity,
+                                        "PostVan"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PostTruck * postFacility.m_PostTruckCapacity,
+                                        "PostTruck"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.MailCap
+                                            * (
+                                                (
+                                                    postFacility.m_MailStorageCapacity
+                                                    + postFacility.m_MailBoxCapacity
+                                                ) / 1000f
+                                            ),
+                                        "MailCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.PostSortingRate
+                                            * (postFacility.m_SortingRate / 1000f),
+                                        "PostSortingRate"
+                                    );
                                 }
 
-                                TelecomFacility TelecomFacility = prefabBase.GetComponent<TelecomFacility>();
+                                TelecomFacility telecomFacility =
+                                    prefabBase.GetComponent<TelecomFacility>();
                                 CrossExamine("TelecomFacility");
-                                if (TelecomFacility != null)
+                                if (telecomFacility != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.TelecomRange * (TelecomFacility.m_Range / 1000f), "TelecomRange");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NetworkCap * (TelecomFacility.m_NetworkCapacity / 1000f), "NetworkCap");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Unity.Mathematics.math.select(Mod.m_Setting.Fibre, Mod.m_Setting.Wireless, TelecomFacility.m_PenetrateTerrain), $"Fibre {TelecomFacility.m_PenetrateTerrain}");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.TelecomRange
+                                            * (telecomFacility.m_Range / 1000f),
+                                        "TelecomRange"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.NetworkCap
+                                            * (telecomFacility.m_NetworkCapacity / 1000f),
+                                        "NetworkCap"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Unity.Mathematics.math.select(
+                                            Mod.m_Setting.Fibre,
+                                            Mod.m_Setting.Wireless,
+                                            telecomFacility.m_PenetrateTerrain
+                                        ),
+                                        $"Fibre {telecomFacility.m_PenetrateTerrain}"
+                                    );
                                 }
 
                                 // Landscaping
 
                                 // General
 
-                                ServiceCoverage ServiceCoverage = prefabBase.GetComponent<ServiceCoverage>();
+                                ServiceCoverage serviceCoverage =
+                                    prefabBase.GetComponent<ServiceCoverage>();
                                 CrossExamine("ServiceCoverage");
-                                if (ServiceCoverage != null)
+                                if (serviceCoverage != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.ServiceCoverageMultiplier * ServiceCoverage.m_Capacity * (ServiceCoverage.m_Magnitude / ServiceCoverage.m_Range), "ServiceCoverage");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.ServiceCoverageMultiplier
+                                            * serviceCoverage.m_Capacity
+                                            * (
+                                                serviceCoverage.m_Magnitude
+                                                / serviceCoverage.m_Range
+                                            ),
+                                        "ServiceCoverage"
+                                    );
                                 }
 
-                                Workplace Workplace = prefabBase.GetComponent<Workplace>();
+                                Workplace workplace = prefabBase.GetComponent<Workplace>();
                                 CrossExamine("Workplace");
-                                if (Workplace != null)
+                                if (workplace != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.EmployeeUpkeep * Workplace.m_Workplaces, $"EmployeeUpkeep_{Workplace.m_Complexity}");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.EmployeeUpkeep * workplace.m_Workplaces,
+                                        $"EmployeeUpkeep_{workplace.m_Complexity}"
+                                    );
                                 }
 
-                                StorageLimit StorageLimit = prefabBase.GetComponent<StorageLimit>();
+                                StorageLimit storageLimit = prefabBase.GetComponent<StorageLimit>();
                                 CrossExamine("StorageLimit");
-                                if (StorageLimit != null)
+                                if (storageLimit != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.StorageUpkeep * (StorageLimit.storageLimit / 1000f), "StorageLimit");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.StorageUpkeep
+                                            * (storageLimit.storageLimit / 100000f),
+                                        "StorageLimit"
+                                    );
                                 }
 
-                                Pollution Pollution = prefabBase.GetComponent<Pollution>();
+                                Pollution pollution = prefabBase.GetComponent<Pollution>();
                                 CrossExamine("Pollution");
-                                if (Pollution != null)
+                                if (pollution != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundPollution * Math.Abs(Pollution.m_GroundPollution / 1000f), "GroundPollution");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AirPollution * Math.Abs(Pollution.m_AirPollution / 1000f), "AirPollution");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NoisePollution * Math.Abs(Pollution.m_NoisePollution / 1000f), "NoisePollution");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.GroundPollution
+                                            * Math.Abs(pollution.m_GroundPollution / 1000f),
+                                        "GroundPollution"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.AirPollution
+                                            * Math.Abs(pollution.m_AirPollution / 1000f),
+                                        "AirPollution"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.NoisePollution
+                                            * Math.Abs(pollution.m_NoisePollution / 1000f),
+                                        "NoisePollution"
+                                    );
                                 }
 
-                                PollutionModifier PollutionModifier = prefabBase.GetComponent<PollutionModifier>();
+                                PollutionModifier pollutionModifier =
+                                    prefabBase.GetComponent<PollutionModifier>();
                                 CrossExamine("PollutionModifier");
-                                if (PollutionModifier != null)
+                                if (pollutionModifier != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.GroundPollution * Math.Abs(PollutionModifier.m_GroundPollutionMultiplier * 10f), "GroundPollutionMultiplier");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.AirPollution * Math.Abs(PollutionModifier.m_AirPollutionMultiplier * 10f), "AirPollutionMultiplier");
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.NoisePollution * Math.Abs(PollutionModifier.m_NoisePollutionMultiplier * 10f), "NoisePollutionMultiplier");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.GroundPollution
+                                            * Math.Abs(
+                                                pollutionModifier.m_GroundPollutionMultiplier * 10f
+                                            ),
+                                        "GroundPollutionMultiplier"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.AirPollution
+                                            * Math.Abs(
+                                                pollutionModifier.m_AirPollutionMultiplier * 10f
+                                            ),
+                                        "AirPollutionMultiplier"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        Mod.m_Setting.NoisePollution
+                                            * Math.Abs(
+                                                pollutionModifier.m_NoisePollutionMultiplier * 10f
+                                            ),
+                                        "NoisePollutionMultiplier"
+                                    );
                                 }
 
-                                UniqueObject UniqueObject = prefabBase.GetComponent<UniqueObject>();
+                                UniqueObject uniqueObject = prefabBase.GetComponent<UniqueObject>();
                                 CrossExamine("UniqueObject");
-                                if (UniqueObject != null)
+                                if (uniqueObject != null)
                                 {
-                                    Multiplier(ref prevMultiplierValue, ref multiplier, logX, Mod.m_Setting.Uniqueness / 100f, "Uniqueness");
+                                    Multiplier(
+                                        ref prevMultiplierValue,
+                                        ref multiplier,
+                                        logX,
+                                        Mod.m_Setting.Uniqueness / 100f,
+                                        "Uniqueness"
+                                    );
                                 }
 
-                                ServiceObject ServiceObject = prefabBase.GetComponent<ServiceObject>();
+                                ServiceObject serviceObject =
+                                    prefabBase.GetComponent<ServiceObject>();
                                 CrossExamine("ServiceObject");
-                                if (ServiceObject != null)
+                                if (serviceObject != null)
                                 {
                                     foreach (var data in serviceBudgetData)
                                     {
-                                        if (data.m_Service == serviceDict[ServiceObject.m_Service])
+                                        if (data.m_Service == serviceDict[serviceObject.m_Service])
                                         {
-                                            Multiplier(ref prevMultiplierValue, ref multiplier, logX, data.m_Budget / 100f, "ServiceObject");
+                                            Multiplier(
+                                                ref prevMultiplierValue,
+                                                ref multiplier,
+                                                logX,
+                                                data.m_Budget / 100f,
+                                                "ServiceObject"
+                                            );
                                             break;
                                         }
                                     }
                                 }
 
-                                ServiceUpgrade ServiceUpgrade = prefabBase.GetComponent<ServiceUpgrade>();
+                                ServiceUpgrade serviceUpgrade =
+                                    prefabBase.GetComponent<ServiceUpgrade>();
                                 CrossExamine("ServiceUpgrade");
-                                if (ServiceUpgrade != null)
+                                if (serviceUpgrade != null)
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, ServiceUpgrade.m_UpgradeCost * 0.05f, "ServiceUpgrade");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        serviceUpgrade.m_UpgradeCost * 0.05f,
+                                        "ServiceUpgrade"
+                                    );
                                 }
 
                                 //CityEffects CityEffects = prefabBase.GetComponent<CityEffects>();
@@ -749,22 +1601,65 @@ namespace SmartUpkeepManager.Systems
                                 //    }
                                 //}
 
-                                if (prefabSystem.TryGetPrefab(prefabData, out BuildingExtensionPrefab BuildingExtension) && BuildingExtension is not null)
+                                float height = 5;
+                                if (
+                                    EntityManager.TryGetComponent<ObjectGeometryData>(
+                                        entity,
+                                        out ObjectGeometryData objectGeometryData
+                                    )
+                                )
                                 {
-                                    int plotSize = BuildingExtension.m_OverrideLotSize.x * BuildingExtension.m_OverrideLotSize.y;
+                                    if (objectGeometryData.m_Size.y >= 1f)
+                                        height = objectGeometryData.m_Size.y;
+                                }
+
+                                if (
+                                    prefabSystem.TryGetPrefab(
+                                        prefabData,
+                                        out BuildingExtensionPrefab buildingExtension
+                                    ) && buildingExtension is not null
+                                )
+                                {
+                                    int plotSize =
+                                        buildingExtension.m_OverrideLotSize.x
+                                        * buildingExtension.m_OverrideLotSize.y;
                                     if (plotSize > 0)
                                     {
-                                        Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Round(Math.Log(plotSize + 1))), "PlotPrice");
+                                        Adder(
+                                            ref prevUpkeepValue,
+                                            ref upkeepValue,
+                                            logX,
+                                            (float)(
+                                                Mod.m_Setting.PlotPrice
+                                                * Math.Round(Math.Log(plotSize + 1) * height)
+                                            ),
+                                            "PlotPrice"
+                                        );
                                     }
                                 }
 
-                                if (prefabSystem.TryGetPrefab(prefabData, out BuildingPrefab Building) && Building is not null)
+                                if (
+                                    prefabSystem.TryGetPrefab(
+                                        prefabData,
+                                        out BuildingPrefab building
+                                    ) && building is not null
+                                )
                                 {
-                                    Adder(ref prevUpkeepValue, ref upkeepValue, logX, (float)(Mod.m_Setting.PlotPrice * Math.Round(Math.Log(Building.lotSize + 1))), "PlotPrice");
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
+                                        logX,
+                                        (float)(
+                                            Mod.m_Setting.PlotPrice
+                                            * Math.Round(Math.Log(building.lotSize + 1) * height)
+                                        ),
+                                        "PlotPrice"
+                                    );
                                 }
 
                                 multiplier = Math.Max(multiplier, 0.1f);
-                                int upkeepValueInt = (int)Math.Round((upkeepValue * multiplier) / 100) * 100;
+                                int upkeepValueInt =
+                                    (int)Math.Round((upkeepValue * multiplier) / 100) * 100;
                                 if (upkeepValueInt >= 0)
                                 {
                                     consumptionData.m_Upkeep = upkeepValueInt;
@@ -772,7 +1667,8 @@ namespace SmartUpkeepManager.Systems
                                     RefreshBuffer(entity, upkeepValueInt);
                                     if (log)
                                     {
-                                        string logText = $"{name};{ogUpkeep[name]};{upkeepValueInt}";
+                                        string logText =
+                                            $"{name};{ogUpkeep[name]};{upkeepValueInt}";
                                         logText = $"{logText};multiplier={multiplier}";
                                         foreach (var vals in prevVal)
                                         {
@@ -783,10 +1679,13 @@ namespace SmartUpkeepManager.Systems
                                 }
                                 else
                                 {
-                                    Mod.log.Info($"Something went wrong: {name}'s upkeep is ${upkeepValue}?");
+                                    Mod.log.Info(
+                                        $"Something went wrong: {name}'s upkeep is ${upkeepValue}?"
+                                    );
                                     if (log)
                                     {
-                                        string logText = $"{name};{ogUpkeep[name]};{upkeepValueInt}";
+                                        string logText =
+                                            $"{name};{ogUpkeep[name]};{upkeepValueInt}";
                                         logText = $"{logText};multiplier={multiplier}";
                                         foreach (var vals in prevVal)
                                         {
@@ -799,7 +1698,10 @@ namespace SmartUpkeepManager.Systems
                         }
                     }
                 }
-                catch (Exception e) { Mod.log.Error(e); }
+                catch (Exception e)
+                {
+                    Mod.log.Error(e);
+                }
             }
         }
 
@@ -812,12 +1714,18 @@ namespace SmartUpkeepManager.Systems
                     string name = item.Key;
                     Entity entity = item.Value;
 
-                    if (EntityManager.TryGetComponent(entity, out PrefabData prefabData) && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase))
+                    if (
+                        EntityManager.TryGetComponent(entity, out PrefabData prefabData)
+                        && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
+                    )
                     {
-
-                        if (EntityManager.TryGetComponent(entity, out ConsumptionData consumptionData))
+                        if (
+                            EntityManager.TryGetComponent(
+                                entity,
+                                out ConsumptionData consumptionData
+                            )
+                        )
                         {
-
                             if (ogUpkeep.ContainsKey(name) && ogUpkeep[name] != 0)
                             {
                                 consumptionData.m_Upkeep = ogUpkeep[name];
@@ -827,7 +1735,10 @@ namespace SmartUpkeepManager.Systems
                         }
                     }
                 }
-                catch (Exception e) { Mod.log.Error(e); }
+                catch (Exception e)
+                {
+                    Mod.log.Error(e);
+                }
             }
         }
 
@@ -854,6 +1765,7 @@ namespace SmartUpkeepManager.Systems
                 return N + (2f * N) + (3f * N) + (t * 4f * N);
             }
         }
+
         float ComputeCombinedValue(float2 healthRange, bool disease, bool injuries)
         {
             float x = healthRange.x;
@@ -869,10 +1781,16 @@ namespace SmartUpkeepManager.Systems
                 extra = Mod.m_Setting.Treatment;
             }
             //Mod.log.Info($"HealthRange ({x} to {y} = Math.Abs({weightedX} - {weightedY}))");
-            return ((Math.Abs(weightedX - weightedY)/N)/100f) + extra;
+            return ((Math.Abs(weightedX - weightedY) / N) / 100f) + extra;
         }
 
-        void Adder(ref float prevUpkeepValue, ref float upkeepValue, bool logX, float adder, string text)
+        void Adder(
+            ref float prevUpkeepValue,
+            ref float upkeepValue,
+            bool logX,
+            float adder,
+            string text
+        )
         {
             prevUpkeepValue = upkeepValue;
             upkeepValue += (float)adder;
@@ -884,7 +1802,13 @@ namespace SmartUpkeepManager.Systems
             //if (logX && diff != 0) Mod.log.Info($"{diff} for {text}");
         }
 
-        void Multiplier(ref float prevMultiplierValue, ref float multipler, bool logX, float adder, string text)
+        void Multiplier(
+            ref float prevMultiplierValue,
+            ref float multipler,
+            bool logX,
+            float adder,
+            string text
+        )
         {
             prevMultiplierValue = multipler;
             multipler += (float)adder;
