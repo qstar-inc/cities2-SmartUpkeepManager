@@ -1,5 +1,5 @@
 ﻿<Publish>
-	<ModId Value="0" />
+	<ModId Value="107487" />
 	<DisplayName Value="Smart Upkeep Manager" />
 	<ShortDescription Value="A mod to dynamically adjust service building upkeep according to a predefined rate." />
 	<LongDescription>
@@ -19,10 +19,12 @@ If you think some values are very out of balance and just changing the sliders w
 	<Screenshot Value="Properties/Screenshot01.png" />
 	<Tag Value="Code Mod" />
 	<ForumLink Value="" />
-	<ModVersion Value="1.0.2" />
-	<GameVersion Value="1.2.*" />
+	<ModVersion Value="1.0.3" />
+	<GameVersion Value="1.3.3f1" />
 	<Dependency Id="" />
 	<ChangeLog>
+- Compatibility update for 1.3.3f1.
+- Add missing localization.
 	</ChangeLog>
 	<ExternalLink Type="buymeacoffee" Url="https://www.buymeacoffee.com/starq" />
 	<ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1364334275767439370" />

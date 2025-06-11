@@ -492,6 +492,14 @@ namespace SmartUpkeepManager
                     $"Specify the upkeep cost for each Adminstration Buildings.\r\nMod default: {Defaults.AdminBuilding}"
                 },
                 // Transportation
+                {
+                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.PlatformMaintenance)),
+                    "Platform Maintenance"
+                },
+                {
+                    m_Setting.GetOptionDescLocaleID(nameof(Setting.PlatformMaintenance)),
+                    $"Specify the upkeep cost for each Platforms.\r\nMod default: {Defaults.PlatformMaintenance}"
+                },
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.Bus)), "Bus" },
                 {
                     m_Setting.GetOptionDescLocaleID(nameof(Setting.Bus)),
