@@ -1,6 +1,4 @@
-﻿using Game.Modding;
-using Game.Vehicles;
-using UnityEngine;
+using Game.Modding;
 
 namespace SmartUpkeepManager
 {
@@ -151,13 +149,13 @@ namespace SmartUpkeepManager
 
         public override void SetDefaults()
         {
-            _dontSave = true;
+            //            _dontSave = true;
             Disable = false;
-#if DEBUG
-            VerboseLogging = true;
-#else
-            VerboseLogging = false;
-#endif
+            //#if DEBUG
+            //            VerboseLogging = true;
+            //#else
+            //            VerboseLogging = false;
+            //#endif
 
             ParkingSpots = Defaults.ParkingSpots;
             RoadMaintenance = Defaults.RoadMaintenance;
@@ -266,19 +264,19 @@ namespace SmartUpkeepManager
             StorageUpkeep = Defaults.StorageUpkeep;
             ServiceBudgetMultiplier = true;
 
-            _dontSave = false;
-            Save();
+            //_dontSave = false;
+            //Save();
         }
 
         public void SetFree()
         {
-            _dontSave = true;
+            //_dontSave = true;
             Disable = false;
-#if DEBUG
-            VerboseLogging = true;
-#else
-            VerboseLogging = false;
-#endif
+            //#if DEBUG
+            //            VerboseLogging = true;
+            //#else
+            //            VerboseLogging = false;
+            //#endif
             ParkingSpots = 0;
             RoadMaintenance = 0;
             SnowPloughing = 0;
@@ -389,8 +387,8 @@ namespace SmartUpkeepManager
             StorageUpkeep = 0;
             ServiceBudgetMultiplier = false;
 
-            _dontSave = false;
-            Save();
+            //_dontSave = false;
+            //Save();
         }
     }
 }

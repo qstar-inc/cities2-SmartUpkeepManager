@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Colossal;
 
 namespace SmartUpkeepManager
@@ -19,12 +19,12 @@ namespace SmartUpkeepManager
         {
             return new Dictionary<string, string>
             {
-                { m_Setting.GetSettingsLocaleID(), Mod.Name },
+                //{ m_Setting.GetSettingsLocaleID(), Mod.Name },
                 { m_Setting.GetOptionTabLocaleID(Setting.Page1), Setting.Page1 },
                 { m_Setting.GetOptionTabLocaleID(Setting.Page2), Setting.Page2 },
                 { m_Setting.GetOptionTabLocaleID(Setting.Page3), Setting.Page3 },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Buttons), Setting.Buttons },
-                { m_Setting.GetOptionGroupLocaleID(Setting.General), Setting.General },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.GeneralGroup), Setting.GeneralGroup },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Roads), Setting.Roads },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Electricity), Setting.Electricity },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Water), Setting.Water },
@@ -39,18 +39,18 @@ namespace SmartUpkeepManager
                 },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Parks), Setting.Parks },
                 { m_Setting.GetOptionGroupLocaleID(Setting.Communication), Setting.Communication },
-                { m_Setting.GetOptionTabLocaleID(Setting.AboutTab), Setting.AboutTab },
-                { m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), Setting.InfoGroup },
+                //{ m_Setting.GetOptionTabLocaleID(Setting.AboutTab), Setting.AboutTab },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), Setting.InfoGroup },
                 { m_Setting.GetOptionLabelLocaleID(nameof(Setting.Disable)), "Disable mod" },
                 {
                     m_Setting.GetOptionDescLocaleID(nameof(Setting.Disable)),
                     $"The mod will be disabled and all vanilla upkeep values will be restored."
                 },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.SaveButton)), "Save Changes" },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.SaveButton)),
-                    $"Save all changes set below."
-                },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.SaveButton)), "Save Changes" },
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.SaveButton)),
+                //    $"Save all changes set below."
+                //},
                 {
                     m_Setting.GetOptionLabelLocaleID(nameof(Setting.ModDefault)),
                     "Reset to Mod Defaults"
@@ -839,25 +839,25 @@ namespace SmartUpkeepManager
                     m_Setting.GetOptionDescLocaleID(nameof(Setting.StorageUpkeep)),
                     $"Specify the upkeep cost for having the storage for each tonne of resource. This is not the same as resource cost. This will be incurring whether something is stored or not.\r\nMod default: {Defaults.StorageUpkeep}"
                 },
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.VerboseLogging)),
-                    "Verbose Logging"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.VerboseLogging)),
-                    $"Enable detailed logging for troubleshooting."
-                },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Mod Name" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.NameText)), "" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Mod Version" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.VersionText)), "" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.AuthorText)), "Author" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.AuthorText)), "" },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.BMaCLink)), "Buy Me a Coffee" },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.BMaCLink)),
-                    "Support the author."
-                },
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.VerboseLogging)),
+                //    "Verbose Logging"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.VerboseLogging)),
+                //    $"Enable detailed logging for troubleshooting."
+                //},
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Mod Name" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.NameText)), "" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Mod Version" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.VersionText)), "" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.AuthorText)), "Author" },
+                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.AuthorText)), "" },
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.BMaCLink)), "Buy Me a Coffee" },
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.BMaCLink)),
+                //    "Support the author."
+                //},
             };
         }
 

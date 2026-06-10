@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using Colossal.Entities;
 using Colossal.Serialization.Entities;
 using Game;
 using Game.Prefabs;
+using StarQ.Shared.Extensions;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -13,22 +13,27 @@ namespace SmartUpkeepManager.Systems
     public partial class SmartUpkeepSystem : GameSystemBase
     {
         private PrefabSystem prefabSystem;
-        private EntityQuery buildingQuery;
-        private static bool log;
         public static readonly Dictionary<string, Entity> buildingDict = new();
         public static readonly Dictionary<ServicePrefab, Entity> serviceDict = new();
         public static readonly Dictionary<string, int> ogUpkeep = new();
         public static readonly Dictionary<string, float> prevVal = new();
 
+        public bool NeedUpdate = false;
+
         //public static List<string> comps = new();
         //public static List<string> toRemove = new();
-        public static bool systemActive = false;
-        public static bool inGame = false;
+        //public static bool systemActive = false;
+        //public static bool inGame = false;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            prefabSystem = World.GetOrCreateSystemManaged<PrefabSystem>();
+            prefabSystem =
+                World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PrefabSystem>();
+
+            Mod.m_Setting.onSettingsApplied += OnSettingsChanged;
+            CollectDataForSUM();
+            NeedUpdate = true;
             //buildingQuery = GetEntityQuery(new EntityQueryDesc()
             //{
             //    //All = new[] {
@@ -52,11 +57,12 @@ namespace SmartUpkeepManager.Systems
         public void CollectDataForSUM()
         {
             //Mod.log.Info("Prefab Data collection started");
-            if (systemActive && buildingDict.Count != 0)
-                return;
+            //if (buildingDict.Count != 0)
+            //    return;
+            buildingDict.Clear();
             try
             {
-                buildingQuery = SystemAPI
+                EntityQuery buildingQuery = SystemAPI
                     .QueryBuilder()
                     //.WithAny<SolarPoweredData, GroundWaterPoweredData, WaterPoweredData, WindPoweredData, PowerPlantData, BatteryData, TransformerData>()
                     //.WithAny<HospitalData>()
@@ -77,7 +83,6 @@ namespace SmartUpkeepManager.Systems
                 {
                     string prefabName = prefabSystem.GetPrefabName(entity);
                     if (!buildingDict.ContainsKey(prefabName))
-                    {
                         if (
                             EntityManager.TryGetComponent(entity, out PrefabData prefabData)
                             && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
@@ -93,19 +98,9 @@ namespace SmartUpkeepManager.Systems
                                     && serviceConsumption.m_Upkeep > 0
                                 )
                                     ogUpkeep.Add(prefabName, serviceConsumption.m_Upkeep);
-                                //Mod.log.Info($"Collecting {prefabName}");
+                                LogHelper.SendLog($"Collecting {prefabName}", LogLevel.DEV);
                             }
-
-                            //foreach (var component in prefabBase.components)
-                            //{
-                            //    string xxx = $"{component.GetType()}".Replace("Game.Prefabs.", "");
-                            //    if (!comps.Contains(xxx))
-                            //    {
-                            //        comps.Add(xxx);
-                            //    }
-                            //}
                         }
-                    }
                 }
 
                 EntityQuery serviceQuery = SystemAPI.QueryBuilder().WithAny<ServiceData>().Build();
@@ -119,83 +114,50 @@ namespace SmartUpkeepManager.Systems
                         serviceDict.Add(ServicePrefab, entity);
                     }
                 }
-
-                systemActive = true;
             }
             catch (Exception e)
             {
-                Mod.log.Error(e);
+                LogHelper.SendLog(e, LogLevel.Error);
             }
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
         {
-            //Mod.log.Info("OnGameLoadingComplete Start");
             base.OnGameLoadingComplete(purpose, mode);
             if (buildingDict.Count == 0)
                 CollectDataForSUM();
-            if (GameModeExtensions.IsGame(mode))
-            {
-                inGame = true;
-                if (!Mod.m_Setting.Disable)
-                {
-                    SetUpkeep();
-                }
-                else
-                {
-                    ResetToVanilla();
-                }
-            }
+            if (mode.IsGame() && !Mod.m_Setting.Disable)
+                SetUpkeep();
             else
-            {
-                inGame = false;
-            }
-            //Mod.log.Info("OnGameLoadingComplete End");
+                ResetToVanilla();
         }
 
-        protected override void OnUpdate() { }
+        protected override void OnUpdate()
+        {
+            if (!NeedUpdate || Mod.m_Setting.Disable)
+                return;
+
+            SetUpkeep();
+            NeedUpdate = false;
+        }
+
+        private void OnSettingsChanged(Game.Settings.Setting setting)
+        {
+            NeedUpdate = true;
+            Update();
+        }
 
         public void SetUpkeep()
         {
-            if (Mod.m_Setting != null)
-            {
-                log = Mod.m_Setting.VerboseLogging;
-            }
-            else
-            {
-                log = false;
-            }
-
             try
             {
                 CalculateUpkeep();
             }
             catch (Exception ex)
             {
-                Mod.log.Error(ex);
+                LogHelper.SendLog(ex, LogLevel.Error);
             }
-            if (log)
-                Mod.log.Info("Update Complete!");
-        }
-
-        public void RefreshBuffer(Entity entity, int amount)
-        {
-            try
-            {
-                DynamicBuffer<ServiceUpkeepData> sudBuffer =
-                    EntityManager.GetBuffer<ServiceUpkeepData>(entity);
-
-                for (int i = 0; i < sudBuffer.Length; i++)
-                {
-                    var uge = sudBuffer[i];
-                    if (uge.m_Upkeep.m_Resource == Game.Economy.Resource.Money)
-                    {
-                        uge.m_Upkeep.m_Amount = amount;
-                        sudBuffer[i] = uge;
-                    }
-                }
-            }
-            catch (Exception) { }
+            LogHelper.SendLog("Update set successful!");
         }
 
         //        protected override void OnDestroy()

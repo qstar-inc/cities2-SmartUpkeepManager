@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Runtime.Remoting.Lifetime;
 using Colossal.Entities;
 using Game;
 using Game.Prefabs;
+using StarQ.Shared.Extensions;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -13,10 +14,6 @@ namespace SmartUpkeepManager.Systems
     {
         public void CalculateUpkeep()
         {
-            bool logX = false;
-#if DEBUG
-            logX = true;
-#endif
             EntityQuery serviceBudgetQuery = SystemAPI
                 .QueryBuilder()
                 .WithAll<Game.Simulation.ServiceBudgetData>()
@@ -59,7 +56,7 @@ namespace SmartUpkeepManager.Systems
                                 // Mixed
                                 MaintenanceDepot maintenanceDepot =
                                     prefabBase.GetComponent<MaintenanceDepot>();
-                                CrossExamine("MaintenanceDepot");
+                                LogHelper.SendLog("MaintenanceDepot", LogLevel.DEV);
                                 if (maintenanceDepot != null)
                                 {
                                     if (
@@ -71,7 +68,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.RoadMaintenance,
                                             "RoadMaintenance"
                                         );
@@ -85,7 +81,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.SnowPloughing,
                                             "SnowPloughing"
                                         );
@@ -99,14 +94,12 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.ParkMaintenance,
                                             "ParkMaintenance"
                                         );
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.ParkMaintenanceVehicle
                                                 * maintenanceDepot.m_VehicleCapacity,
                                             "ParkMaintenanceVehicle"
@@ -121,7 +114,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.Towing,
                                             "Towing"
                                         );
@@ -141,7 +133,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.RoadMaintenanceVehicle
                                                 * maintenanceDepot.m_VehicleCapacity,
                                             "RoadMaintenanceVehicle"
@@ -151,7 +142,7 @@ namespace SmartUpkeepManager.Systems
 
                                 ObjectSubObjects objectSubObjects =
                                     prefabBase.GetComponent<ObjectSubObjects>();
-                                CrossExamine("ObjectSubObjects");
+                                LogHelper.SendLog("ObjectSubObjects", LogLevel.DEV);
                                 if (objectSubObjects != null)
                                 {
                                     int parkingSpaces = 0;
@@ -179,18 +170,14 @@ namespace SmartUpkeepManager.Systems
                                             || objName == "ParkingLotElectricDecal01"
                                             || objName == "ParkingLotServiceDecal01"
                                         )
-                                        {
                                             parkingSpaces++;
-                                        }
                                         else if (
                                             objName == "ParkingLotDoubleDecal01"
                                             || objName == "ParkingLotDoubleDecal02"
                                             || objName == "ParkingLotDoubleServiceDecal01"
                                             || objName == "ParkingLotDoubleServiceDecal02"
                                         )
-                                        {
                                             parkingSpaces += 2;
-                                        }
                                         else if (
                                             objName == "ParkingLotDecal02"
                                             || objName == "ParkingLotDiagonalDecal02"
@@ -198,48 +185,36 @@ namespace SmartUpkeepManager.Systems
                                             || objName == "ParkingLotElectricDecal02"
                                             || objName == "ParkingLotServiceDecal02"
                                         )
-                                        {
                                             parkingSpaces += 3;
-                                        }
                                         else if (
                                             objName == "ParkingLotDecal03"
                                             || objName == "ParkingLotDiagonalDecal03"
                                             || objName == "ParkingLotServiceDecal03"
                                         )
-                                        {
                                             parkingSpaces += 5;
-                                        }
                                         else if (
                                             objName == "ParkingLotDecal04"
                                             || objName == "ParkingLotServiceDecal04"
                                         )
-                                        {
                                             parkingSpaces += 10;
-                                        }
                                         else if (
                                             objName.StartsWith("ParkingLot")
                                             && objName.Contains("Decal0")
                                         )
-                                        {
                                             parkingSpaces++;
-                                        }
                                         else if (objName.StartsWith("Integrated"))
-                                        {
                                             platforms++;
-                                        }
                                     }
 
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ParkingSpots * parkingSpaces,
                                         "ParkingSpots"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PlatformMaintenance * platforms,
                                         "Platforms"
                                     );
@@ -248,13 +223,12 @@ namespace SmartUpkeepManager.Systems
                                 // Roads
                                 ParkingFacility parkingFacility =
                                     prefabBase.GetComponent<ParkingFacility>();
-                                CrossExamine("ParkingFacility");
+                                LogHelper.SendLog("ParkingFacility", LogLevel.DEV);
                                 if (parkingFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ParkingSpots
                                             * parkingFacility.m_GarageMarkerCapacity,
                                         "GarageMarker"
@@ -263,13 +237,12 @@ namespace SmartUpkeepManager.Systems
 
                                 // Electricity
                                 SolarPowered solarPowered = prefabBase.GetComponent<SolarPowered>();
-                                CrossExamine("SolarPowered");
+                                LogHelper.SendLog("SolarPowered", LogLevel.DEV);
                                 if (solarPowered != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.SolarPowered
                                             * (solarPowered.m_Production / 1000f),
                                         "SolarPowered"
@@ -278,13 +251,12 @@ namespace SmartUpkeepManager.Systems
 
                                 GroundWaterPowered groundWaterPowered =
                                     prefabBase.GetComponent<GroundWaterPowered>();
-                                CrossExamine("GroundWaterPowered");
+                                LogHelper.SendLog("GroundWaterPowered", LogLevel.DEV);
                                 if (groundWaterPowered != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.GroundWaterPowered
                                             * (groundWaterPowered.m_Production / 1000f),
                                         "GroundWaterPowered"
@@ -292,13 +264,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 WaterPowered waterPowered = prefabBase.GetComponent<WaterPowered>();
-                                CrossExamine("WaterPowered");
+                                LogHelper.SendLog("WaterPowered", LogLevel.DEV);
                                 if (waterPowered != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.WaterPowered
                                             * (
                                                 waterPowered.m_CapacityFactor
@@ -310,13 +281,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 WindPowered windPowered = prefabBase.GetComponent<WindPowered>();
-                                CrossExamine("WindPowered");
+                                LogHelper.SendLog("WindPowered", LogLevel.DEV);
                                 if (windPowered != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.WindPowered
                                             * (windPowered.m_Production / 1000f),
                                         "WindPowered"
@@ -325,13 +295,12 @@ namespace SmartUpkeepManager.Systems
 
                                 GarbagePowered gabagePowered =
                                     prefabBase.GetComponent<GarbagePowered>();
-                                CrossExamine("GarbagePowered");
+                                LogHelper.SendLog("GarbagePowered", LogLevel.DEV);
                                 if (gabagePowered != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.GarbagePowered
                                             * gabagePowered.m_ProductionPerUnit
                                             * (gabagePowered.m_Capacity / 1000f),
@@ -340,13 +309,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 PowerPlant powerPlant = prefabBase.GetComponent<PowerPlant>();
-                                CrossExamine("PowerPlant");
+                                LogHelper.SendLog("PowerPlant", LogLevel.DEV);
                                 if (powerPlant != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ElectricityProduction
                                             * (powerPlant.m_ElectricityProduction / 1000f),
                                         "ElectricityProduction"
@@ -354,33 +322,30 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 Battery battery = prefabBase.GetComponent<Battery>();
-                                CrossExamine("Battery");
+                                LogHelper.SendLog("Battery", LogLevel.DEV);
                                 if (battery != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.BatteryOut * (battery.m_PowerOutput / 1000f),
                                         "BatteryOut"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.BatteryCap * (battery.m_Capacity / 1000f),
                                         "BatteryCap"
                                     );
                                 }
 
                                 Transformer transformer = prefabBase.GetComponent<Transformer>();
-                                CrossExamine("Transformer");
+                                LogHelper.SendLog("Transformer", LogLevel.DEV);
                                 if (transformer != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Transformer,
                                         "Transformer"
                                     );
@@ -390,13 +355,12 @@ namespace SmartUpkeepManager.Systems
 
                                 WaterPumpingStation waterPumpingStation =
                                     prefabBase.GetComponent<WaterPumpingStation>();
-                                CrossExamine("WaterPumpingStation");
+                                LogHelper.SendLog("WaterPumpingStation", LogLevel.DEV);
                                 if (waterPumpingStation != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.WaterPumpCap
                                             * (waterPumpingStation.m_Capacity / 1000f),
                                         "WaterPumpCap"
@@ -404,7 +368,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Purification
                                             * waterPumpingStation.m_Purification,
                                         "WaterPurification"
@@ -412,13 +375,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 SewageOutlet sewageOutlet = prefabBase.GetComponent<SewageOutlet>();
-                                CrossExamine("SewageOutlet");
+                                LogHelper.SendLog("SewageOutlet", LogLevel.DEV);
                                 if (sewageOutlet != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.SewageOutCap
                                             * (sewageOutlet.m_Capacity / 1000f),
                                         "SewageOutCap"
@@ -426,7 +388,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Purification * sewageOutlet.m_Purification,
                                         "SewagePurification"
                                     );
@@ -434,20 +395,18 @@ namespace SmartUpkeepManager.Systems
 
                                 //Healthcare & Deathcare
                                 Hospital hospital = prefabBase.GetComponent<Hospital>();
-                                CrossExamine("Hospital");
+                                LogHelper.SendLog("Hospital", LogLevel.DEV);
                                 if (hospital != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Ambulance * hospital.m_AmbulanceCapacity,
                                         "Ambulance"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.MedicalHelicopter
                                             * hospital.m_MedicalHelicopterCapacity,
                                         "MedicalHelicopter"
@@ -455,11 +414,10 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Patient * hospital.m_PatientCapacity,
                                         "Patient"
                                     );
-                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Mod.m_Setting.HealthBonus * Hospital.m_TreatmentBonus, "HealthBonus");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue,  Mod.m_Setting.HealthBonus * Hospital.m_TreatmentBonus, "HealthBonus");
 
                                     float weightedX = SegmentedWeight(
                                         hospital.m_HealthRange.x,
@@ -507,30 +465,27 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         valx,
                                         "HealthBonusRange"
                                     );
-                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatDiseases ? Mod.m_Setting.Treatment : 0f, "TreatDiseases");
-                                    //Adder(ref prevUpkeepValue, ref upkeepValue, logX, Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue,  Hospital.m_TreatDiseases ? Mod.m_Setting.Treatment : 0f, "TreatDiseases");
+                                    //Adder(ref prevUpkeepValue, ref upkeepValue,  Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
                                 }
 
                                 DeathcareFacility deathcareFacility =
                                     prefabBase.GetComponent<DeathcareFacility>();
-                                CrossExamine("DeathcareFacility");
+                                LogHelper.SendLog("DeathcareFacility", LogLevel.DEV);
                                 if (deathcareFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Hearse * deathcareFacility.m_HearseCapacity,
                                         "Hearse"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         (Mod.m_Setting.BodyStorage / 100f)
                                             * deathcareFacility.m_StorageCapacity
                                             * (deathcareFacility.m_LongTermStorage ? 1f : 0.3f),
@@ -539,7 +494,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.BodyProcessing
                                             * deathcareFacility.m_ProcessingRate,
                                         "BodyProcessing"
@@ -549,13 +503,12 @@ namespace SmartUpkeepManager.Systems
                                 // Garbage Management
                                 GarbageFacility garbageFacility =
                                     prefabBase.GetComponent<GarbageFacility>();
-                                CrossExamine("GarbageFacility");
+                                LogHelper.SendLog("GarbageFacility", LogLevel.DEV);
                                 if (garbageFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.GarbageTruck
                                             * garbageFacility.m_VehicleCapacity,
                                         "GarbageTruck"
@@ -563,7 +516,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.DumpTruck
                                             * garbageFacility.m_TransportCapacity,
                                         "DumpTruck"
@@ -571,7 +523,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         (Mod.m_Setting.GarbageCap / 1000f)
                                             * garbageFacility.m_GarbageCapacity
                                             * (garbageFacility.m_LongTermStorage ? 1f : 0.3f)
@@ -581,7 +532,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         (Mod.m_Setting.GarbageProcessing / 1000f)
                                             * (garbageFacility.m_ProcessingSpeed / 1000f)
                                             * (garbageFacility.m_IndustrialWasteOnly ? 0.1f : 1f),
@@ -591,20 +541,18 @@ namespace SmartUpkeepManager.Systems
 
                                 // Education & Research
                                 School school = prefabBase.GetComponent<School>();
-                                CrossExamine("School");
+                                LogHelper.SendLog("School", LogLevel.DEV);
                                 if (school != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Student * school.m_StudentCapacity,
                                         $"Student_{school.m_Level}"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.StudentGraduation
                                             * school.m_GraduationModifier
                                             * 100f,
@@ -613,14 +561,12 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.StudentWellbeing * school.m_StudentWellbeing,
                                         "StudentWellbeing"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.StudentHealth * school.m_StudentHealth,
                                         "StudentHealth"
                                     );
@@ -628,13 +574,12 @@ namespace SmartUpkeepManager.Systems
 
                                 ResearchFacility researchFacility =
                                     prefabBase.GetComponent<ResearchFacility>();
-                                CrossExamine("ResearchFacility");
+                                LogHelper.SendLog("ResearchFacility", LogLevel.DEV);
                                 if (researchFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ResearchFacility,
                                         "ResearchFacility"
                                     );
@@ -642,20 +587,18 @@ namespace SmartUpkeepManager.Systems
 
                                 // Fire & Rescue
                                 FireStation fireStation = prefabBase.GetComponent<FireStation>();
-                                CrossExamine("FireStation");
+                                LogHelper.SendLog("FireStation", LogLevel.DEV);
                                 if (fireStation != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.FireTruck * fireStation.m_FireEngineCapacity,
                                         "FireTruck"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.FireHelicopter
                                             * fireStation.m_FireHelicopterCapacity,
                                         "FireHelicopter"
@@ -663,7 +606,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.FireDisasterCap
                                             * fireStation.m_DisasterResponseCapacity,
                                         "FireDisasterCap"
@@ -671,7 +613,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.FireVehicleEffi
                                             * fireStation.m_VehicleEfficiency,
                                         "FireVehicleEffi"
@@ -680,13 +621,12 @@ namespace SmartUpkeepManager.Systems
 
                                 FirewatchTower firewatchTower =
                                     prefabBase.GetComponent<FirewatchTower>();
-                                CrossExamine("FirewatchTower");
+                                LogHelper.SendLog("FirewatchTower", LogLevel.DEV);
                                 if (firewatchTower != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Firewatch,
                                         "Firewatch"
                                     );
@@ -694,13 +634,12 @@ namespace SmartUpkeepManager.Systems
 
                                 EarlyDisasterWarningSystem earlyDisasterWarningSystem =
                                     prefabBase.GetComponent<EarlyDisasterWarningSystem>();
-                                CrossExamine("EarlyDisasterWarningSystem");
+                                LogHelper.SendLog("EarlyDisasterWarningSystem", LogLevel.DEV);
                                 if (earlyDisasterWarningSystem != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.EarlyDisasterWarningSystem,
                                         "EarlyDisasterWarningSystem"
                                     );
@@ -708,13 +647,12 @@ namespace SmartUpkeepManager.Systems
 
                                 DisasterFacility disasterFacility =
                                     prefabBase.GetComponent<DisasterFacility>();
-                                CrossExamine("DisasterFacility");
+                                LogHelper.SendLog("DisasterFacility", LogLevel.DEV);
                                 if (disasterFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.DisasterFacility,
                                         "DisasterFacility"
                                     );
@@ -722,13 +660,12 @@ namespace SmartUpkeepManager.Systems
 
                                 EmergencyShelter emergencyShelter =
                                     prefabBase.GetComponent<EmergencyShelter>();
-                                CrossExamine("EmergencyShelter");
+                                LogHelper.SendLog("EmergencyShelter", LogLevel.DEV);
                                 if (emergencyShelter != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.EvacuationBus
                                             * emergencyShelter.m_VehicleCapacity,
                                         "EvacuationBus"
@@ -736,7 +673,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ShelterCap
                                             * emergencyShelter.m_ShelterCapacity
                                             / 1000f,
@@ -746,13 +682,12 @@ namespace SmartUpkeepManager.Systems
 
                                 EmergencyGenerator emergencyGenerator =
                                     prefabBase.GetComponent<EmergencyGenerator>();
-                                CrossExamine("EmergencyGenerator");
+                                LogHelper.SendLog("EmergencyGenerator", LogLevel.DEV);
                                 if (emergencyGenerator != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.EmergencyGenerator
                                             * (emergencyGenerator.m_ElectricityProduction / 1000f),
                                         "EmergencyGenerator"
@@ -762,20 +697,18 @@ namespace SmartUpkeepManager.Systems
                                 // Police & Administration
                                 PoliceStation policeStation =
                                     prefabBase.GetComponent<PoliceStation>();
-                                CrossExamine("PoliceStation");
+                                LogHelper.SendLog("PoliceStation", LogLevel.DEV);
                                 if (policeStation != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PatrolCar * policeStation.m_PatrolCarCapacity,
                                         "PatrolCar"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PoliceHelicopter
                                             * policeStation.m_PoliceHelicopterCapacity,
                                         "PoliceHelicopter"
@@ -783,7 +716,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.LocalJail * policeStation.m_JailCapacity,
                                         "LocalJail"
                                     );
@@ -793,7 +725,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.Patrol,
                                             "Patrol"
                                         );
@@ -803,7 +734,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.EmergencyPolice,
                                             "Emergency"
                                         );
@@ -815,7 +745,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.Intelligence,
                                             "Intelligence"
                                         );
@@ -823,27 +752,24 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 Prison prison = prefabBase.GetComponent<Prison>();
-                                CrossExamine("Prison");
+                                LogHelper.SendLog("Prison", LogLevel.DEV);
                                 if (prison != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PrisonVan * prison.m_PrisonVanCapacity,
                                         "PrisonVan"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PrisonerCap * prison.m_PrisonerCapacity,
                                         "PrisonerCap"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PrisonerWellbeing
                                             * prison.m_PrisonerWellbeing,
                                         "PrisonerWellbeing"
@@ -851,7 +777,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PrisonerHealth * prison.m_PrisonerHealth,
                                         "PrisonerHealth"
                                     );
@@ -859,13 +784,12 @@ namespace SmartUpkeepManager.Systems
 
                                 WelfareOffice welfareOffice =
                                     prefabBase.GetComponent<WelfareOffice>();
-                                CrossExamine("WelfareOffice");
+                                LogHelper.SendLog("WelfareOffice", LogLevel.DEV);
                                 if (welfareOffice != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.WelfareOffice,
                                         "WelfareOffice"
                                     );
@@ -873,13 +797,12 @@ namespace SmartUpkeepManager.Systems
 
                                 AdministrationBuilding administrationBuilding =
                                     prefabBase.GetComponent<AdministrationBuilding>();
-                                CrossExamine("AdministrationBuilding");
+                                LogHelper.SendLog("AdministrationBuilding", LogLevel.DEV);
                                 if (administrationBuilding != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.AdminBuilding,
                                         "AdminBuilding"
                                     );
@@ -888,7 +811,7 @@ namespace SmartUpkeepManager.Systems
                                 // Transportation
                                 TransportDepot transportDepot =
                                     prefabBase.GetComponent<TransportDepot>();
-                                CrossExamine("TransportDepot");
+                                LogHelper.SendLog("TransportDepot", LogLevel.DEV);
                                 if (transportDepot != null)
                                 {
                                     TransportType transportType = transportDepot.m_TransportType;
@@ -929,7 +852,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         transportMuliplier * transportDepot.m_VehicleCapacity,
                                         $"TransportType_{transportType}"
                                     );
@@ -954,7 +876,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         energyValue,
                                         $"EnergyTypes_{energyType}"
                                     );
@@ -962,7 +883,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Math.Max(
                                             Mod.m_Setting.MaintenanceBoost,
                                             Mod.m_Setting.MaintenanceBoost
@@ -976,7 +896,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             Mod.m_Setting.DispatchCenter,
                                             "DispatchCenter"
                                         );
@@ -985,13 +904,12 @@ namespace SmartUpkeepManager.Systems
 
                                 CargoTransportStation cargoTransportStation =
                                     prefabBase.GetComponent<CargoTransportStation>();
-                                CrossExamine("CargoTransportStation");
+                                LogHelper.SendLog("CargoTransportStation", LogLevel.DEV);
                                 if (cargoTransportStation != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.TradedResource
                                             * cargoTransportStation.m_TradedResources.Length,
                                         "TradedResource"
@@ -999,7 +917,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.DeliveryTruck
                                             * cargoTransportStation.transports,
                                         "DeliveryTruck"
@@ -1029,7 +946,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"CarRefuelTypes_{cargoTransportStation.m_CarRefuelTypes}"
                                         );
@@ -1059,7 +975,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"TrainRefuelTypes_{cargoTransportStation.m_TrainRefuelTypes}"
                                         );
@@ -1089,7 +1004,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"WatercraftRefuel_{cargoTransportStation.m_WatercraftRefuelTypes}"
                                         );
@@ -1119,7 +1033,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"AircraftRefuelTypes_{cargoTransportStation.m_AircraftRefuelTypes}"
                                         );
@@ -1128,7 +1041,7 @@ namespace SmartUpkeepManager.Systems
 
                                 TransportStation transportStation =
                                     prefabBase.GetComponent<TransportStation>();
-                                CrossExamine("TransportStation");
+                                LogHelper.SendLog("TransportStation", LogLevel.DEV);
                                 if (transportStation != null)
                                 {
                                     if (
@@ -1155,7 +1068,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"CarRefuelTypes_{transportStation.m_CarRefuelTypes}"
                                         );
@@ -1185,7 +1097,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"TrainRefuelTypes_{transportStation.m_TrainRefuelTypes}"
                                         );
@@ -1215,7 +1126,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"WatercraftRefuel_{transportStation.m_WatercraftRefuelTypes}"
                                         );
@@ -1245,7 +1155,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             energyValue,
                                             $"AircraftRefuelTypes_{transportStation.m_AircraftRefuelTypes}"
                                         );
@@ -1254,7 +1163,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ComfortFactor
                                             * transportStation.m_ComfortFactor
                                             * 100f,
@@ -1265,7 +1173,7 @@ namespace SmartUpkeepManager.Systems
                                 // Parks & Recreation
                                 LeisureProvider leisureProvider =
                                     prefabBase.GetComponent<LeisureProvider>();
-                                CrossExamine("LeisureProvider");
+                                LogHelper.SendLog("LeisureProvider", LogLevel.DEV);
                                 if (leisureProvider != null)
                                 {
                                     Game.Agents.LeisureType leisureType =
@@ -1307,7 +1215,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         leisureMultiplier
                                             * (
                                                 Mod.m_Setting.LeisureEfficieny
@@ -1318,13 +1225,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 Attraction attraction = prefabBase.GetComponent<Attraction>();
-                                CrossExamine("Attraction");
+                                LogHelper.SendLog("Attraction", LogLevel.DEV);
                                 if (attraction != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.Attraction * attraction.m_Attractiveness,
                                         "Attraction"
                                     );
@@ -1332,27 +1238,24 @@ namespace SmartUpkeepManager.Systems
 
                                 // Communication
                                 PostFacility postFacility = prefabBase.GetComponent<PostFacility>();
-                                CrossExamine("PostFacility");
+                                LogHelper.SendLog("PostFacility", LogLevel.DEV);
                                 if (postFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PostVan * postFacility.m_PostVanCapacity,
                                         "PostVan"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PostTruck * postFacility.m_PostTruckCapacity,
                                         "PostTruck"
                                     );
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.MailCap
                                             * (
                                                 (
@@ -1365,7 +1268,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.PostSortingRate
                                             * (postFacility.m_SortingRate / 1000f),
                                         "PostSortingRate"
@@ -1374,13 +1276,12 @@ namespace SmartUpkeepManager.Systems
 
                                 TelecomFacility telecomFacility =
                                     prefabBase.GetComponent<TelecomFacility>();
-                                CrossExamine("TelecomFacility");
+                                LogHelper.SendLog("TelecomFacility", LogLevel.DEV);
                                 if (telecomFacility != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.TelecomRange
                                             * (telecomFacility.m_Range / 1000f),
                                         "TelecomRange"
@@ -1388,7 +1289,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.NetworkCap
                                             * (telecomFacility.m_NetworkCapacity / 1000f),
                                         "NetworkCap"
@@ -1396,7 +1296,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Unity.Mathematics.math.select(
                                             Mod.m_Setting.Fibre,
                                             Mod.m_Setting.Wireless,
@@ -1412,13 +1311,12 @@ namespace SmartUpkeepManager.Systems
 
                                 ServiceCoverage serviceCoverage =
                                     prefabBase.GetComponent<ServiceCoverage>();
-                                CrossExamine("ServiceCoverage");
+                                LogHelper.SendLog("ServiceCoverage", LogLevel.DEV);
                                 if (serviceCoverage != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.ServiceCoverageMultiplier
                                             * serviceCoverage.m_Capacity
                                             * (
@@ -1430,26 +1328,24 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 Workplace workplace = prefabBase.GetComponent<Workplace>();
-                                CrossExamine("Workplace");
+                                LogHelper.SendLog("Workplace", LogLevel.DEV);
                                 if (workplace != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.EmployeeUpkeep * workplace.m_Workplaces,
                                         $"EmployeeUpkeep_{workplace.m_Complexity}"
                                     );
                                 }
 
                                 StorageLimit storageLimit = prefabBase.GetComponent<StorageLimit>();
-                                CrossExamine("StorageLimit");
+                                LogHelper.SendLog("StorageLimit", LogLevel.DEV);
                                 if (storageLimit != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.StorageUpkeep
                                             * (storageLimit.storageLimit / 100000f),
                                         "StorageLimit"
@@ -1457,13 +1353,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 Pollution pollution = prefabBase.GetComponent<Pollution>();
-                                CrossExamine("Pollution");
+                                LogHelper.SendLog("Pollution", LogLevel.DEV);
                                 if (pollution != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.GroundPollution
                                             * Math.Abs(pollution.m_GroundPollution / 1000f),
                                         "GroundPollution"
@@ -1471,7 +1366,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.AirPollution
                                             * Math.Abs(pollution.m_AirPollution / 1000f),
                                         "AirPollution"
@@ -1479,7 +1373,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.NoisePollution
                                             * Math.Abs(pollution.m_NoisePollution / 1000f),
                                         "NoisePollution"
@@ -1488,13 +1381,12 @@ namespace SmartUpkeepManager.Systems
 
                                 PollutionModifier pollutionModifier =
                                     prefabBase.GetComponent<PollutionModifier>();
-                                CrossExamine("PollutionModifier");
+                                LogHelper.SendLog("PollutionModifier", LogLevel.DEV);
                                 if (pollutionModifier != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.GroundPollution
                                             * Math.Abs(
                                                 pollutionModifier.m_GroundPollutionMultiplier * 10f
@@ -1504,7 +1396,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.AirPollution
                                             * Math.Abs(
                                                 pollutionModifier.m_AirPollutionMultiplier * 10f
@@ -1514,7 +1405,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         Mod.m_Setting.NoisePollution
                                             * Math.Abs(
                                                 pollutionModifier.m_NoisePollutionMultiplier * 10f
@@ -1524,13 +1414,12 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 UniqueObject uniqueObject = prefabBase.GetComponent<UniqueObject>();
-                                CrossExamine("UniqueObject");
+                                LogHelper.SendLog("UniqueObject", LogLevel.DEV);
                                 if (uniqueObject != null)
                                 {
                                     Multiplier(
                                         ref prevMultiplierValue,
                                         ref multiplier,
-                                        logX,
                                         Mod.m_Setting.Uniqueness / 100f,
                                         "Uniqueness"
                                     );
@@ -1538,7 +1427,7 @@ namespace SmartUpkeepManager.Systems
 
                                 ServiceObject serviceObject =
                                     prefabBase.GetComponent<ServiceObject>();
-                                CrossExamine("ServiceObject");
+                                LogHelper.SendLog("ServiceObject", LogLevel.DEV);
                                 if (serviceObject != null)
                                 {
                                     foreach (var data in serviceBudgetData)
@@ -1548,7 +1437,6 @@ namespace SmartUpkeepManager.Systems
                                             Multiplier(
                                                 ref prevMultiplierValue,
                                                 ref multiplier,
-                                                logX,
                                                 data.m_Budget / 100f,
                                                 "ServiceObject"
                                             );
@@ -1559,44 +1447,43 @@ namespace SmartUpkeepManager.Systems
 
                                 ServiceUpgrade serviceUpgrade =
                                     prefabBase.GetComponent<ServiceUpgrade>();
-                                CrossExamine("ServiceUpgrade");
+                                LogHelper.SendLog("ServiceUpgrade", LogLevel.DEV);
                                 if (serviceUpgrade != null)
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         serviceUpgrade.m_UpgradeCost * 0.05f,
                                         "ServiceUpgrade"
                                     );
                                 }
 
                                 //CityEffects CityEffects = prefabBase.GetComponent<CityEffects>();
-                                //CrossExamine("CityEffects");
+                                //LogHelper.SendLog("CityEffects",LogLevel.DEV);
                                 //if (CityEffects != null && Mod.m_Setting.CityBonusMultiplier)
                                 //{
                                 //    foreach (var data in CityEffects.m_Effects)
                                 //    {
                                 //        if (data.m_Mode.HasFlag(ModifierValueMode.Relative) || data.m_Mode.HasFlag(ModifierValueMode.InverseRelative))
                                 //        {
-                                //            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), $"CityEffects_{data.m_Mode}");
+                                //            Multiplier(ref prevMultiplierValue, ref multiplier,  Math.Abs(data.m_Delta), $"CityEffects_{data.m_Mode}");
                                 //        }
                                 //    }
                                 //}
 
                                 //LocalEffects LocalEffects = prefabBase.GetComponent<LocalEffects>();
-                                //CrossExamine("LocalEffects");
+                                //LogHelper.SendLog("LocalEffects",LogLevel.DEV);
                                 //if (LocalEffects != null && Mod.m_Setting.CityBonusMultiplier)
                                 //{
                                 //    foreach (var data in LocalEffects.m_Effects)
                                 //    {
                                 //        if (data.m_Mode.HasFlag(ModifierValueMode.Relative) || data.m_Mode.HasFlag(ModifierValueMode.InverseRelative))
                                 //        {
-                                //            Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta), $"LocalEffects_{data.m_Mode}");
+                                //            Multiplier(ref prevMultiplierValue, ref multiplier,  Math.Abs(data.m_Delta), $"LocalEffects_{data.m_Mode}");
                                 //        }
                                 //        //if (data.m_Mode == ModifierValueMode.Absolute)
                                 //        //{
-                                //        //    Multiplier(ref prevMultiplierValue, ref multiplier, logX, Math.Abs(data.m_Delta - 100f), "LocalEffects.Absolute");
+                                //        //    Multiplier(ref prevMultiplierValue, ref multiplier,  Math.Abs(data.m_Delta - 100f), "LocalEffects.Absolute");
                                 //        //}
                                 //    }
                                 //}
@@ -1628,7 +1515,6 @@ namespace SmartUpkeepManager.Systems
                                         Adder(
                                             ref prevUpkeepValue,
                                             ref upkeepValue,
-                                            logX,
                                             (float)(
                                                 Mod.m_Setting.PlotPrice
                                                 * Math.Round(Math.Log(plotSize + 1) * height)
@@ -1648,7 +1534,6 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        logX,
                                         (float)(
                                             Mod.m_Setting.PlotPrice
                                             * Math.Round(Math.Log(building.lotSize + 1) * height)
@@ -1665,34 +1550,30 @@ namespace SmartUpkeepManager.Systems
                                     consumptionData.m_Upkeep = upkeepValueInt;
                                     EntityManager.SetComponentData(entity, consumptionData);
                                     RefreshBuffer(entity, upkeepValueInt);
-                                    if (log)
+#if DEBUG
+
+                                    string logText = $"{name};{ogUpkeep[name]};{upkeepValueInt}";
+                                    logText = $"{logText};multiplier={multiplier}";
+                                    foreach (var vals in prevVal)
                                     {
-                                        string logText =
-                                            $"{name};{ogUpkeep[name]};{upkeepValueInt}";
-                                        logText = $"{logText};multiplier={multiplier}";
-                                        foreach (var vals in prevVal)
-                                        {
-                                            logText = $"{logText};{vals.Key}={vals.Value}";
-                                        }
-                                        Mod.log.Info(logText);
+                                        logText = $"{logText};{vals.Key}={vals.Value}";
                                     }
+                                    LogHelper.SendLog(logText, LogLevel.DEV);
+#endif
                                 }
                                 else
                                 {
-                                    Mod.log.Info(
-                                        $"Something went wrong: {name}'s upkeep is ${upkeepValue}?"
+                                    LogHelper.SendLog(
+                                        $"Something went wrong: {name}'s upkeep is ${upkeepValue}?",
+                                        LogLevel.Error
                                     );
-                                    if (log)
+                                    string logText = $"{name};{ogUpkeep[name]};{upkeepValueInt}";
+                                    logText = $"{logText};multiplier={multiplier}";
+                                    foreach (var vals in prevVal)
                                     {
-                                        string logText =
-                                            $"{name};{ogUpkeep[name]};{upkeepValueInt}";
-                                        logText = $"{logText};multiplier={multiplier}";
-                                        foreach (var vals in prevVal)
-                                        {
-                                            logText = $"{logText};{vals.Key}={vals.Value}";
-                                        }
-                                        Mod.log.Info(logText);
+                                        logText = $"{logText};{vals.Key}={vals.Value}";
                                     }
+                                    LogHelper.SendLog(logText, LogLevel.Error);
                                 }
                             }
                         }
@@ -1700,7 +1581,7 @@ namespace SmartUpkeepManager.Systems
                 }
                 catch (Exception e)
                 {
-                    Mod.log.Error(e);
+                    LogHelper.SendLog(e, LogLevel.DEV);
                 }
             }
         }
@@ -1737,75 +1618,66 @@ namespace SmartUpkeepManager.Systems
                 }
                 catch (Exception e)
                 {
-                    Mod.log.Error(e);
+                    LogHelper.SendLog(e, LogLevel.Error);
                 }
             }
         }
 
+        public void RefreshBuffer(Entity entity, int amount)
+        {
+            try
+            {
+                DynamicBuffer<ServiceUpkeepData> sudBuffer =
+                    EntityManager.GetBuffer<ServiceUpkeepData>(entity);
+
+                for (int i = 0; i < sudBuffer.Length; i++)
+                {
+                    var uge = sudBuffer[i];
+                    if (uge.m_Upkeep.m_Resource == Game.Economy.Resource.Money)
+                    {
+                        uge.m_Upkeep.m_Amount = amount;
+                        sudBuffer[i] = uge;
+                    }
+                }
+            }
+            catch (Exception) { }
+        }
+
         float SegmentedWeight(float input, float N)
         {
-            if (input < 25)
-            {
-                float t = input / 25;
-                return t * N;
-            }
-            else if (input < 50)
-            {
-                float t = (input - 25) / 25;
-                return N + (t * 2f * N);
-            }
-            else if (input < 75)
-            {
-                float t = (input - 50) / 25;
-                return N + (2f * N) + (t * 3f * N);
-            }
-            else
-            {
-                float t = (input - 75) / 25;
-                return N + (2f * N) + (3f * N) + (t * 4f * N);
-            }
+            input = Math.Clamp(input, 0f, 100f);
+            int segment = (int)(input / 25f);
+            float fraction = (input % 25f) / 25f;
+            float baseWeight = 0f;
+
+            for (int i = 0; i < segment; i++)
+                baseWeight += (i + 1) * N;
+
+            float currentSegmentWeight = (segment + 1) * N * fraction;
+            return baseWeight + currentSegmentWeight;
+
+            //if (input < 25)
+            //    return (input / 25) * N;
+            //else if (input < 50)
+            //    return N + (((input - 25) / 25) * 2f * N);
+            //else if (input < 75)
+            //    return N + (2f * N) + (((input - 50) / 25) * 3f * N);
+            //else
+            //    return N + (2f * N) + (3f * N) + (((input - 75) / 25) * 4f * N);
         }
 
-        float ComputeCombinedValue(float2 healthRange, bool disease, bool injuries)
-        {
-            float x = healthRange.x;
-            float y = healthRange.y;
-            float N = Mod.m_Setting.HealthRange;
-
-            float weightedX = SegmentedWeight(x, N);
-            float weightedY = SegmentedWeight(y, N);
-
-            float extra = 0;
-            if (disease || injuries)
-            {
-                extra = Mod.m_Setting.Treatment;
-            }
-            //Mod.log.Info($"HealthRange ({x} to {y} = Math.Abs({weightedX} - {weightedY}))");
-            return ((Math.Abs(weightedX - weightedY) / N) / 100f) + extra;
-        }
-
-        void Adder(
-            ref float prevUpkeepValue,
-            ref float upkeepValue,
-            bool logX,
-            float adder,
-            string text
-        )
+        void Adder(ref float prevUpkeepValue, ref float upkeepValue, float adder, string text)
         {
             prevUpkeepValue = upkeepValue;
             upkeepValue += (float)adder;
             var diff = upkeepValue - prevUpkeepValue;
             if (!prevVal.ContainsKey(text) && diff != 0f)
-            {
                 prevVal[text] = diff;
-            }
-            //if (logX && diff != 0) Mod.log.Info($"{diff} for {text}");
         }
 
         void Multiplier(
             ref float prevMultiplierValue,
             ref float multipler,
-            bool logX,
             float adder,
             string text
         )
@@ -1814,15 +1686,7 @@ namespace SmartUpkeepManager.Systems
             multipler += (float)adder;
             var diff = multipler - prevMultiplierValue;
             if (!prevVal.ContainsKey($"{text}_x") && diff != 0f)
-            {
                 prevVal[$"{text}_x"] = diff;
-            }
-            //if (logX) Mod.log.Info($"{multipler - prevMultiplierValue}x for {text}");
-        }
-
-        void CrossExamine(string text)
-        {
-            //if (!toRemove.Contains(text)) toRemove.Add(text);
         }
     }
 }
