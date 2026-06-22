@@ -1,0 +1,2 @@
+- No major code changes. Recent Skyve update that came with Summer Solistice (1.6.0f1) patch should fix the random unsubscribe issue.
+- Minor code cleanup.

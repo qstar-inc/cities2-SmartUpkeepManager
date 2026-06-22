@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Colossal.IO.AssetDatabase;
-using Colossal.Localization;
 using Colossal.Logging;
 using Game;
 using Game.Modding;
 using Game.SceneFlow;
 using SmartUpkeepManager.Systems;
 using StarQ.Shared.Extensions;
-using Unity.Entities;
 
 namespace SmartUpkeepManager
 {
@@ -29,14 +27,8 @@ namespace SmartUpkeepManager
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            //LocalizationManager locMan = GameManager.instance.localizationManager;
             LogHelper.Init(Id, log);
             LocaleHelper.Init(Id, Name, GetReplacements);
-
-            //foreach (var item in new LocaleHelper($"{Id}.Locale.json").GetAvailableLanguages())
-            //    locMan.AddSource(item.LocaleId, item);
-
-            //locMan.onActiveDictionaryChanged += LocaleHelper.OnActiveDictionaryChanged;
 
             m_Setting = new Setting(this);
             m_Setting.RegisterInOptionsUI();
@@ -47,21 +39,19 @@ namespace SmartUpkeepManager
                 m_Setting,
                 new Setting(this)
             );
-            World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<SmartUpkeepSystem>();
+            WorldHelper.GetSystem<SmartUpkeepSystem>();
         }
 
         public void OnDispose()
         {
-            if (m_Setting != null)
-            {
-                m_Setting.UnregisterInOptionsUI();
-                m_Setting = null;
-            }
+            LocaleHelper.Dispose();
+            m_Setting?.UnregisterInOptionsUI();
+            m_Setting = null;
         }
 
         public static Dictionary<string, string> GetReplacements()
         {
-            return new() { }; //{ "X", "Y" } };
+            return new() { };
         }
     }
 }
