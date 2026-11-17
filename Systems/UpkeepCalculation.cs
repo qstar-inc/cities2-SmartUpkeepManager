@@ -1,12 +1,10 @@
 using System;
-using System.Runtime.Remoting.Lifetime;
+using System.Text;
 using Colossal.Entities;
 using Game;
 using Game.Prefabs;
 using StarQ.Shared.Extensions;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 
 namespace SmartUpkeepManager.Systems
 {
@@ -18,12 +16,22 @@ namespace SmartUpkeepManager.Systems
                 .QueryBuilder()
                 .WithAll<Game.Simulation.ServiceBudgetData>()
                 .Build();
-            Entity serviceBudgetEntity = serviceBudgetQuery.ToEntityArray(Allocator.Temp)[0];
-            EntityManager.TryGetBuffer(
-                serviceBudgetEntity,
-                true,
-                out DynamicBuffer<Game.Simulation.ServiceBudgetData> serviceBudgetData
-            );
+
+            if (serviceBudgetQuery.IsEmpty)
+                return;
+
+            Entity serviceBudgetEntity = serviceBudgetQuery.GetSingletonEntity();
+            if (
+                !EntityManager.TryGetBuffer(
+                    serviceBudgetEntity,
+                    true,
+                    out DynamicBuffer<Game.Simulation.ServiceBudgetData> serviceBudgetData
+                )
+            )
+                return;
+
+            StringBuilder sb = new();
+            sb.AppendLine("");
 
             foreach (var item in buildingDict)
             {
@@ -37,11 +45,9 @@ namespace SmartUpkeepManager.Systems
                     float multiplier = 1f;
                     float prevMultiplierValue = 0f;
 
-                    //Mod.log.Info("============");
-
                     if (
                         EntityManager.TryGetComponent(entity, out PrefabData prefabData)
-                        && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
+                        && prefabSystem.TryGetPrefab(entity, out PrefabBase prefabBase)
                     )
                     {
                         if (
@@ -54,10 +60,7 @@ namespace SmartUpkeepManager.Systems
                             if (ogUpkeep.ContainsKey(name) && ogUpkeep[name] != 0)
                             {
                                 // Mixed
-                                MaintenanceDepot maintenanceDepot =
-                                    prefabBase.GetComponent<MaintenanceDepot>();
-                                LogHelper.SendLog("MaintenanceDepot", LogLevel.DEV);
-                                if (maintenanceDepot != null)
+                                if (prefabBase.TryGet(out MaintenanceDepot maintenanceDepot))
                                 {
                                     if (
                                         maintenanceDepot.m_MaintenanceType.HasFlag(
@@ -140,13 +143,12 @@ namespace SmartUpkeepManager.Systems
                                     }
                                 }
 
-                                ObjectSubObjects objectSubObjects =
-                                    prefabBase.GetComponent<ObjectSubObjects>();
-                                LogHelper.SendLog("ObjectSubObjects", LogLevel.DEV);
-                                if (objectSubObjects != null)
+                                if (prefabBase.TryGet(out ObjectSubObjects objectSubObjects))
                                 {
                                     int parkingSpaces = 0;
-                                    int platforms = 0;
+                                    int bicycleSpaces = 0;
+                                    float platforms = 0f;
+
                                     for (int i = 0; i < objectSubObjects.m_SubObjects.Length; i++)
                                     {
                                         ObjectSubObjectInfo objectSubObjectInfo =
@@ -156,54 +158,132 @@ namespace SmartUpkeepManager.Systems
                                             || objectSubObjectInfo.m_Object == null
                                         )
                                             continue;
-                                        string objName = objectSubObjectInfo.m_Object.name;
+
                                         if (
-                                            !objName.StartsWith("ParkingLot")
-                                            && !objName.Contains("Decal0")
-                                            && !objName.StartsWith("Integrated")
+                                            objectSubObjectInfo.m_Object.TryGet(
+                                                out ObjectSubLanes osl
+                                            )
                                         )
-                                            continue;
+                                        {
+                                            foreach (
+                                                ObjectSubLaneInfo subLaneInfo in osl.m_SubLanes
+                                            )
+                                            {
+                                                if (
+                                                    subLaneInfo.m_LanePrefab
+                                                        is NetLanePrefab lanePrefab
+                                                    && lanePrefab.TryGet(
+                                                        out Game.Prefabs.ParkingLane parkingLane
+                                                    )
+                                                )
+                                                {
+                                                    int count = ParkingHelper.GetParkingSlotCount(
+                                                        subLaneInfo.m_BezierCurve,
+                                                        parkingLane
+                                                    );
+                                                    if (
+                                                        parkingLane.m_RoadType
+                                                        == Game.Net.RoadTypes.Car
+                                                    )
+                                                        parkingSpaces += count;
+                                                    else if (
+                                                        parkingLane.m_RoadType
+                                                        == Game.Net.RoadTypes.Bicycle
+                                                    )
+                                                        bicycleSpaces += count;
+                                                }
+                                            }
+                                        }
+
                                         if (
-                                            objName == "ParkingLotDecal01"
-                                            || objName == "ParkingLotDiagonalDecal01"
-                                            || objName == "ParkingLotDisabledDecal01"
-                                            || objName == "ParkingLotElectricDecal01"
-                                            || objName == "ParkingLotServiceDecal01"
+                                            objectSubObjectInfo.m_Object.TryGet(
+                                                out TransportStop ts
+                                            )
                                         )
-                                            parkingSpaces++;
-                                        else if (
-                                            objName == "ParkingLotDoubleDecal01"
-                                            || objName == "ParkingLotDoubleDecal02"
-                                            || objName == "ParkingLotDoubleServiceDecal01"
-                                            || objName == "ParkingLotDoubleServiceDecal02"
-                                        )
-                                            parkingSpaces += 2;
-                                        else if (
-                                            objName == "ParkingLotDecal02"
-                                            || objName == "ParkingLotDiagonalDecal02"
-                                            || objName == "ParkingLotDisabledDecal02"
-                                            || objName == "ParkingLotElectricDecal02"
-                                            || objName == "ParkingLotServiceDecal02"
-                                        )
-                                            parkingSpaces += 3;
-                                        else if (
-                                            objName == "ParkingLotDecal03"
-                                            || objName == "ParkingLotDiagonalDecal03"
-                                            || objName == "ParkingLotServiceDecal03"
-                                        )
-                                            parkingSpaces += 5;
-                                        else if (
-                                            objName == "ParkingLotDecal04"
-                                            || objName == "ParkingLotServiceDecal04"
-                                        )
-                                            parkingSpaces += 10;
-                                        else if (
-                                            objName.StartsWith("ParkingLot")
-                                            && objName.Contains("Decal0")
-                                        )
-                                            parkingSpaces++;
-                                        else if (objName.StartsWith("Integrated"))
-                                            platforms++;
+                                        {
+                                            switch (ts.m_TransportType)
+                                            {
+                                                case TransportType.Bicycle:
+                                                    platforms += 0.1f;
+                                                    break;
+                                                case TransportType.Taxi:
+                                                    platforms += 0.5f;
+                                                    break;
+                                                case TransportType.Bus:
+                                                    platforms += 1.0f;
+                                                    break;
+                                                case TransportType.Tram:
+                                                    platforms += 1.5f;
+                                                    break;
+                                                case TransportType.Train:
+                                                case TransportType.Subway:
+                                                    platforms += 2.0f;
+                                                    break;
+                                                case TransportType.Ferry:
+                                                    platforms += 2.5f;
+                                                    break;
+                                                case TransportType.Ship:
+                                                    platforms += 3.0f;
+                                                    break;
+                                                case TransportType.Airplane:
+                                                    platforms += 4.0f;
+                                                    break;
+                                                case TransportType.Rocket:
+                                                    platforms += 5.0f;
+                                                    break;
+                                            }
+                                            if (ts.m_CargoTransport)
+                                                platforms *= 1.5f;
+                                        }
+
+                                        //        string objName = objectSubObjectInfo.m_Object.name;
+                                        //        if (
+                                        //            !objName.StartsWith("ParkingLot")
+                                        //            && !objName.Contains("Decal0")
+                                        //            && !objName.StartsWith("Integrated")
+                                        //        )
+                                        //            continue;
+                                        //        if (
+                                        //            objName == "ParkingLotDecal01"
+                                        //            || objName == "ParkingLotDiagonalDecal01"
+                                        //            || objName == "ParkingLotDisabledDecal01"
+                                        //            || objName == "ParkingLotElectricDecal01"
+                                        //            || objName == "ParkingLotServiceDecal01"
+                                        //        )
+                                        //            parkingSpaces++;
+                                        //        else if (
+                                        //            objName == "ParkingLotDoubleDecal01"
+                                        //            || objName == "ParkingLotDoubleDecal02"
+                                        //            || objName == "ParkingLotDoubleServiceDecal01"
+                                        //            || objName == "ParkingLotDoubleServiceDecal02"
+                                        //        )
+                                        //            parkingSpaces += 2;
+                                        //        else if (
+                                        //            objName == "ParkingLotDecal02"
+                                        //            || objName == "ParkingLotDiagonalDecal02"
+                                        //            || objName == "ParkingLotDisabledDecal02"
+                                        //            || objName == "ParkingLotElectricDecal02"
+                                        //            || objName == "ParkingLotServiceDecal02"
+                                        //        )
+                                        //            parkingSpaces += 3;
+                                        //        else if (
+                                        //            objName == "ParkingLotDecal03"
+                                        //            || objName == "ParkingLotDiagonalDecal03"
+                                        //            || objName == "ParkingLotServiceDecal03"
+                                        //        )
+                                        //            parkingSpaces += 5;
+                                        //        else if (
+                                        //            objName == "ParkingLotDecal04"
+                                        //            || objName == "ParkingLotServiceDecal04"
+                                        //        )
+                                        //            parkingSpaces += 10;
+                                        //        else if (
+                                        //            objName.StartsWith("ParkingLot")
+                                        //            && objName.Contains("Decal0")
+                                        //        )
+                                        //            parkingSpaces++;
+                                        //        else if (objName.StartsWith("Integrated"))
+                                        //            platforms++;
                                     }
 
                                     Adder(
@@ -215,30 +295,36 @@ namespace SmartUpkeepManager.Systems
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
+                                        Mod.m_Setting.ParkingSpots * 0.1f * bicycleSpaces,
+                                        "ParkingSpots"
+                                    );
+                                    Adder(
+                                        ref prevUpkeepValue,
+                                        ref upkeepValue,
                                         Mod.m_Setting.PlatformMaintenance * platforms,
                                         "Platforms"
                                     );
                                 }
 
                                 // Roads
-                                ParkingFacility parkingFacility =
-                                    prefabBase.GetComponent<ParkingFacility>();
-                                LogHelper.SendLog("ParkingFacility", LogLevel.DEV);
-                                if (parkingFacility != null)
+                                if (prefabBase.TryGet(out ParkingFacility parkingFacility))
                                 {
+                                    float multiBike =
+                                        parkingFacility.m_RoadTypes == Game.Net.RoadTypes.Bicycle
+                                            ? 0.1f
+                                            : 1f;
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
                                         Mod.m_Setting.ParkingSpots
+                                            * multiBike
                                             * parkingFacility.m_GarageMarkerCapacity,
                                         "GarageMarker"
                                     );
                                 }
 
                                 // Electricity
-                                SolarPowered solarPowered = prefabBase.GetComponent<SolarPowered>();
-                                LogHelper.SendLog("SolarPowered", LogLevel.DEV);
-                                if (solarPowered != null)
+                                if (prefabBase.TryGet(out SolarPowered solarPowered))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -249,10 +335,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                GroundWaterPowered groundWaterPowered =
-                                    prefabBase.GetComponent<GroundWaterPowered>();
-                                LogHelper.SendLog("GroundWaterPowered", LogLevel.DEV);
-                                if (groundWaterPowered != null)
+                                if (prefabBase.TryGet(out GroundWaterPowered groundWaterPowered))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -263,9 +346,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                WaterPowered waterPowered = prefabBase.GetComponent<WaterPowered>();
-                                LogHelper.SendLog("WaterPowered", LogLevel.DEV);
-                                if (waterPowered != null)
+                                if (prefabBase.TryGet(out WaterPowered waterPowered))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -280,9 +361,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                WindPowered windPowered = prefabBase.GetComponent<WindPowered>();
-                                LogHelper.SendLog("WindPowered", LogLevel.DEV);
-                                if (windPowered != null)
+                                if (prefabBase.TryGet(out WindPowered windPowered))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -293,10 +372,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                GarbagePowered gabagePowered =
-                                    prefabBase.GetComponent<GarbagePowered>();
-                                LogHelper.SendLog("GarbagePowered", LogLevel.DEV);
-                                if (gabagePowered != null)
+                                if (prefabBase.TryGet(out GarbagePowered gabagePowered))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -308,9 +384,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                PowerPlant powerPlant = prefabBase.GetComponent<PowerPlant>();
-                                LogHelper.SendLog("PowerPlant", LogLevel.DEV);
-                                if (powerPlant != null)
+                                if (prefabBase.TryGet(out PowerPlant powerPlant))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -321,9 +395,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                Battery battery = prefabBase.GetComponent<Battery>();
-                                LogHelper.SendLog("Battery", LogLevel.DEV);
-                                if (battery != null)
+                                if (prefabBase.TryGet(out Battery battery))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -339,9 +411,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                Transformer transformer = prefabBase.GetComponent<Transformer>();
-                                LogHelper.SendLog("Transformer", LogLevel.DEV);
-                                if (transformer != null)
+                                if (prefabBase.TryGet(out Transformer transformer))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -352,11 +422,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 //Water & Sewage
-
-                                WaterPumpingStation waterPumpingStation =
-                                    prefabBase.GetComponent<WaterPumpingStation>();
-                                LogHelper.SendLog("WaterPumpingStation", LogLevel.DEV);
-                                if (waterPumpingStation != null)
+                                if (prefabBase.TryGet(out WaterPumpingStation waterPumpingStation))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -374,9 +440,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                SewageOutlet sewageOutlet = prefabBase.GetComponent<SewageOutlet>();
-                                LogHelper.SendLog("SewageOutlet", LogLevel.DEV);
-                                if (sewageOutlet != null)
+                                if (prefabBase.TryGet(out SewageOutlet sewageOutlet))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -394,9 +458,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 //Healthcare & Deathcare
-                                Hospital hospital = prefabBase.GetComponent<Hospital>();
-                                LogHelper.SendLog("Hospital", LogLevel.DEV);
-                                if (hospital != null)
+                                if (prefabBase.TryGet(out Hospital hospital))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -472,10 +534,7 @@ namespace SmartUpkeepManager.Systems
                                     //Adder(ref prevUpkeepValue, ref upkeepValue,  Hospital.m_TreatInjuries ? Mod.m_Setting.Treatment : 0f, "TreatInjuries");
                                 }
 
-                                DeathcareFacility deathcareFacility =
-                                    prefabBase.GetComponent<DeathcareFacility>();
-                                LogHelper.SendLog("DeathcareFacility", LogLevel.DEV);
-                                if (deathcareFacility != null)
+                                if (prefabBase.TryGet(out DeathcareFacility deathcareFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -501,10 +560,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Garbage Management
-                                GarbageFacility garbageFacility =
-                                    prefabBase.GetComponent<GarbageFacility>();
-                                LogHelper.SendLog("GarbageFacility", LogLevel.DEV);
-                                if (garbageFacility != null)
+                                if (prefabBase.TryGet(out GarbageFacility garbageFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -540,14 +596,16 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Education & Research
-                                School school = prefabBase.GetComponent<School>();
-                                LogHelper.SendLog("School", LogLevel.DEV);
-                                if (school != null)
+                                if (prefabBase.TryGet(out School school))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
                                         ref upkeepValue,
-                                        Mod.m_Setting.Student * school.m_StudentCapacity,
+                                        (int)(
+                                            Mod.m_Setting.Student
+                                            * (1 + ((int)school.m_Level / 10))
+                                            * school.m_StudentCapacity
+                                        ),
                                         $"Student_{school.m_Level}"
                                     );
                                     Adder(
@@ -572,10 +630,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                ResearchFacility researchFacility =
-                                    prefabBase.GetComponent<ResearchFacility>();
-                                LogHelper.SendLog("ResearchFacility", LogLevel.DEV);
-                                if (researchFacility != null)
+                                if (prefabBase.TryGet(out ResearchFacility researchFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -586,9 +641,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Fire & Rescue
-                                FireStation fireStation = prefabBase.GetComponent<FireStation>();
-                                LogHelper.SendLog("FireStation", LogLevel.DEV);
-                                if (fireStation != null)
+                                if (prefabBase.TryGet(out FireStation fireStation))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -619,10 +672,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                FirewatchTower firewatchTower =
-                                    prefabBase.GetComponent<FirewatchTower>();
-                                LogHelper.SendLog("FirewatchTower", LogLevel.DEV);
-                                if (firewatchTower != null)
+                                if (prefabBase.TryGet(out FirewatchTower firewatchTower))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -632,10 +682,11 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                EarlyDisasterWarningSystem earlyDisasterWarningSystem =
-                                    prefabBase.GetComponent<EarlyDisasterWarningSystem>();
-                                LogHelper.SendLog("EarlyDisasterWarningSystem", LogLevel.DEV);
-                                if (earlyDisasterWarningSystem != null)
+                                if (
+                                    prefabBase.TryGet(
+                                        out EarlyDisasterWarningSystem earlyDisasterWarningSystem
+                                    )
+                                )
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -645,10 +696,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                DisasterFacility disasterFacility =
-                                    prefabBase.GetComponent<DisasterFacility>();
-                                LogHelper.SendLog("DisasterFacility", LogLevel.DEV);
-                                if (disasterFacility != null)
+                                if (prefabBase.TryGet(out DisasterFacility disasterFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -658,10 +706,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                EmergencyShelter emergencyShelter =
-                                    prefabBase.GetComponent<EmergencyShelter>();
-                                LogHelper.SendLog("EmergencyShelter", LogLevel.DEV);
-                                if (emergencyShelter != null)
+                                if (prefabBase.TryGet(out EmergencyShelter emergencyShelter))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -680,10 +725,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                EmergencyGenerator emergencyGenerator =
-                                    prefabBase.GetComponent<EmergencyGenerator>();
-                                LogHelper.SendLog("EmergencyGenerator", LogLevel.DEV);
-                                if (emergencyGenerator != null)
+                                if (prefabBase.TryGet(out EmergencyGenerator emergencyGenerator))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -695,10 +737,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Police & Administration
-                                PoliceStation policeStation =
-                                    prefabBase.GetComponent<PoliceStation>();
-                                LogHelper.SendLog("PoliceStation", LogLevel.DEV);
-                                if (policeStation != null)
+                                if (prefabBase.TryGet(out PoliceStation policeStation))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -751,9 +790,7 @@ namespace SmartUpkeepManager.Systems
                                     }
                                 }
 
-                                Prison prison = prefabBase.GetComponent<Prison>();
-                                LogHelper.SendLog("Prison", LogLevel.DEV);
-                                if (prison != null)
+                                if (prefabBase.TryGet(out Prison prison))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -782,10 +819,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                WelfareOffice welfareOffice =
-                                    prefabBase.GetComponent<WelfareOffice>();
-                                LogHelper.SendLog("WelfareOffice", LogLevel.DEV);
-                                if (welfareOffice != null)
+                                if (prefabBase.TryGet(out WelfareOffice welfareOffice))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -795,10 +829,11 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                AdministrationBuilding administrationBuilding =
-                                    prefabBase.GetComponent<AdministrationBuilding>();
-                                LogHelper.SendLog("AdministrationBuilding", LogLevel.DEV);
-                                if (administrationBuilding != null)
+                                if (
+                                    prefabBase.TryGet(
+                                        out AdministrationBuilding administrationBuilding
+                                    )
+                                )
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -809,10 +844,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Transportation
-                                TransportDepot transportDepot =
-                                    prefabBase.GetComponent<TransportDepot>();
-                                LogHelper.SendLog("TransportDepot", LogLevel.DEV);
-                                if (transportDepot != null)
+                                if (prefabBase.TryGet(out TransportDepot transportDepot))
                                 {
                                     TransportType transportType = transportDepot.m_TransportType;
                                     float transportMuliplier = 0f;
@@ -902,10 +934,11 @@ namespace SmartUpkeepManager.Systems
                                     }
                                 }
 
-                                CargoTransportStation cargoTransportStation =
-                                    prefabBase.GetComponent<CargoTransportStation>();
-                                LogHelper.SendLog("CargoTransportStation", LogLevel.DEV);
-                                if (cargoTransportStation != null)
+                                if (
+                                    prefabBase.TryGet(
+                                        out CargoTransportStation cargoTransportStation
+                                    )
+                                )
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1039,10 +1072,7 @@ namespace SmartUpkeepManager.Systems
                                     }
                                 }
 
-                                TransportStation transportStation =
-                                    prefabBase.GetComponent<TransportStation>();
-                                LogHelper.SendLog("TransportStation", LogLevel.DEV);
-                                if (transportStation != null)
+                                if (prefabBase.TryGet(out TransportStation transportStation))
                                 {
                                     if (
                                         !transportStation.m_CarRefuelTypes.HasFlag(
@@ -1171,10 +1201,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Parks & Recreation
-                                LeisureProvider leisureProvider =
-                                    prefabBase.GetComponent<LeisureProvider>();
-                                LogHelper.SendLog("LeisureProvider", LogLevel.DEV);
-                                if (leisureProvider != null)
+                                if (prefabBase.TryGet(out LeisureProvider leisureProvider))
                                 {
                                     Game.Agents.LeisureType leisureType =
                                         leisureProvider.m_LeisureType;
@@ -1224,9 +1251,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                Attraction attraction = prefabBase.GetComponent<Attraction>();
-                                LogHelper.SendLog("Attraction", LogLevel.DEV);
-                                if (attraction != null)
+                                if (prefabBase.TryGet(out Attraction attraction))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1237,9 +1262,7 @@ namespace SmartUpkeepManager.Systems
                                 }
 
                                 // Communication
-                                PostFacility postFacility = prefabBase.GetComponent<PostFacility>();
-                                LogHelper.SendLog("PostFacility", LogLevel.DEV);
-                                if (postFacility != null)
+                                if (prefabBase.TryGet(out PostFacility postFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1274,10 +1297,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                TelecomFacility telecomFacility =
-                                    prefabBase.GetComponent<TelecomFacility>();
-                                LogHelper.SendLog("TelecomFacility", LogLevel.DEV);
-                                if (telecomFacility != null)
+                                if (prefabBase.TryGet(out TelecomFacility telecomFacility))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1308,11 +1328,7 @@ namespace SmartUpkeepManager.Systems
                                 // Landscaping
 
                                 // General
-
-                                ServiceCoverage serviceCoverage =
-                                    prefabBase.GetComponent<ServiceCoverage>();
-                                LogHelper.SendLog("ServiceCoverage", LogLevel.DEV);
-                                if (serviceCoverage != null)
+                                if (prefabBase.TryGet(out ServiceCoverage serviceCoverage))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1327,9 +1343,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                Workplace workplace = prefabBase.GetComponent<Workplace>();
-                                LogHelper.SendLog("Workplace", LogLevel.DEV);
-                                if (workplace != null)
+                                if (prefabBase.TryGet(out Workplace workplace))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1339,9 +1353,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                StorageLimit storageLimit = prefabBase.GetComponent<StorageLimit>();
-                                LogHelper.SendLog("StorageLimit", LogLevel.DEV);
-                                if (storageLimit != null)
+                                if (prefabBase.TryGet(out StorageLimit storageLimit))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1352,9 +1364,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                Pollution pollution = prefabBase.GetComponent<Pollution>();
-                                LogHelper.SendLog("Pollution", LogLevel.DEV);
-                                if (pollution != null)
+                                if (prefabBase.TryGet(out Pollution pollution))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1379,10 +1389,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                PollutionModifier pollutionModifier =
-                                    prefabBase.GetComponent<PollutionModifier>();
-                                LogHelper.SendLog("PollutionModifier", LogLevel.DEV);
-                                if (pollutionModifier != null)
+                                if (prefabBase.TryGet(out PollutionModifier pollutionModifier))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1413,9 +1420,7 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                UniqueObject uniqueObject = prefabBase.GetComponent<UniqueObject>();
-                                LogHelper.SendLog("UniqueObject", LogLevel.DEV);
-                                if (uniqueObject != null)
+                                if (prefabBase.TryGet(out UniqueObject uniqueObject))
                                 {
                                     Multiplier(
                                         ref prevMultiplierValue,
@@ -1425,30 +1430,24 @@ namespace SmartUpkeepManager.Systems
                                     );
                                 }
 
-                                ServiceObject serviceObject =
-                                    prefabBase.GetComponent<ServiceObject>();
-                                LogHelper.SendLog("ServiceObject", LogLevel.DEV);
-                                if (serviceObject != null)
-                                {
-                                    foreach (var data in serviceBudgetData)
-                                    {
-                                        if (data.m_Service == serviceDict[serviceObject.m_Service])
-                                        {
-                                            Multiplier(
-                                                ref prevMultiplierValue,
-                                                ref multiplier,
-                                                data.m_Budget / 100f,
-                                                "ServiceObject"
-                                            );
-                                            break;
-                                        }
-                                    }
-                                }
+                                //if (prefabBase.TryGet(out ServiceObject serviceObject))
+                                //{
+                                //    foreach (var data in serviceBudgetData)
+                                //    {
+                                //        if (data.m_Service == serviceDict[serviceObject.m_Service])
+                                //        {
+                                //            Multiplier(
+                                //                ref prevMultiplierValue,
+                                //                ref multiplier,
+                                //                data.m_Budget / 100f,
+                                //                "ServiceObject"
+                                //            );
+                                //            break;
+                                //        }
+                                //    }
+                                //}
 
-                                ServiceUpgrade serviceUpgrade =
-                                    prefabBase.GetComponent<ServiceUpgrade>();
-                                LogHelper.SendLog("ServiceUpgrade", LogLevel.DEV);
-                                if (serviceUpgrade != null)
+                                if (prefabBase.TryGet(out ServiceUpgrade serviceUpgrade))
                                 {
                                     Adder(
                                         ref prevUpkeepValue,
@@ -1490,7 +1489,7 @@ namespace SmartUpkeepManager.Systems
 
                                 float height = 5;
                                 if (
-                                    EntityManager.TryGetComponent<ObjectGeometryData>(
+                                    EntityManager.TryGetComponent(
                                         entity,
                                         out ObjectGeometryData objectGeometryData
                                     )
@@ -1558,7 +1557,7 @@ namespace SmartUpkeepManager.Systems
                                     {
                                         logText = $"{logText};{vals.Key}={vals.Value}";
                                     }
-                                    LogHelper.SendLog(logText, LogLevel.DEV);
+                                    sb.AppendLine(logText);
 #endif
                                 }
                                 else
@@ -1584,6 +1583,8 @@ namespace SmartUpkeepManager.Systems
                     LogHelper.SendLog(e, LogLevel.DEV);
                 }
             }
+
+            LogHelper.SendLog(sb, LogLevel.DEVD);
         }
 
         public void ResetToVanilla()
@@ -1595,10 +1596,7 @@ namespace SmartUpkeepManager.Systems
                     string name = item.Key;
                     Entity entity = item.Value;
 
-                    if (
-                        EntityManager.TryGetComponent(entity, out PrefabData prefabData)
-                        && prefabSystem.TryGetPrefab(prefabData, out PrefabBase prefabBase)
-                    )
+                    if (prefabSystem.TryGetPrefab(entity, out PrefabBase prefabBase))
                     {
                         if (
                             EntityManager.TryGetComponent(
@@ -1627,20 +1625,30 @@ namespace SmartUpkeepManager.Systems
         {
             try
             {
-                DynamicBuffer<ServiceUpkeepData> sudBuffer =
-                    EntityManager.GetBuffer<ServiceUpkeepData>(entity);
+                if (
+                    !EntityManager.TryGetBuffer<ServiceUpkeepData>(
+                        entity,
+                        false,
+                        out DynamicBuffer<ServiceUpkeepData> sudBuffer
+                    )
+                )
+                    return;
 
                 for (int i = 0; i < sudBuffer.Length; i++)
                 {
-                    var uge = sudBuffer[i];
+                    ServiceUpkeepData uge = sudBuffer[i];
                     if (uge.m_Upkeep.m_Resource == Game.Economy.Resource.Money)
                     {
                         uge.m_Upkeep.m_Amount = amount;
                         sudBuffer[i] = uge;
+                        break;
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                LogHelper.SendLog(e, LogLevel.Error);
+            }
         }
 
         float SegmentedWeight(float input, float N)

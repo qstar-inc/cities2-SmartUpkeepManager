@@ -19,8 +19,8 @@ If you think some values are very out of balance and just changing the sliders w
   <Screenshot Value="Properties/Screenshot01.png" />
   <Tag Value="Code Mod" />
   <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/starq-mods-assets-projects-megathread.1930389/" />
-  <ModVersion Value="1.0.6" />
-  <GameVersion Value="1.6.0*" />
+  <ModVersion Value="1.0.7" />
+  <GameVersion Value="1.6.2*" />
   <Dependency Id="" />
   <ChangeLog>- No major code changes. Recent Skyve update that came with Summer Solistice (1.6.0f1) patch should fix the random unsubscribe issue.
 - Minor code cleanup.</ChangeLog>

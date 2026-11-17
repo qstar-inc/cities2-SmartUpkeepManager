@@ -141,21 +141,9 @@ namespace SmartUpkeepManager
 
     public partial class Setting : ModSetting
     {
-        public Setting(IMod mod)
-            : base(mod)
-        {
-            SetDefaults();
-        }
-
         public override void SetDefaults()
         {
-            //            _dontSave = true;
-            Disable = false;
-            //#if DEBUG
-            //            VerboseLogging = true;
-            //#else
-            //            VerboseLogging = false;
-            //#endif
+            EnableMod = true;
 
             ParkingSpots = Defaults.ParkingSpots;
             RoadMaintenance = Defaults.RoadMaintenance;
@@ -214,6 +202,7 @@ namespace SmartUpkeepManager
             PrisonerHealth = Defaults.PrisonerHealth;
             WelfareOffice = Defaults.WelfareOffice;
             AdminBuilding = Defaults.AdminBuilding;
+            PlatformMaintenance = Defaults.PlatformMaintenance;
             Bus = Defaults.Bus;
             Train = Defaults.Train;
             Taxi = Defaults.Taxi;
@@ -271,7 +260,7 @@ namespace SmartUpkeepManager
         public void SetFree()
         {
             //_dontSave = true;
-            Disable = false;
+            EnableMod = true;
             //#if DEBUG
             //            VerboseLogging = true;
             //#else
@@ -307,9 +296,6 @@ namespace SmartUpkeepManager
             GarbageTruck = 0;
             DumpTruck = 0;
             GarbageProcessing = 0;
-            //StudentPrimary = 0;
-            //StudentSecondary = 0;
-            //StudentTertiary = 0;
             Student = 0;
             StudentGraduation = 0;
             StudentWellbeing = 0;
@@ -337,6 +323,7 @@ namespace SmartUpkeepManager
             PrisonerHealth = 0;
             WelfareOffice = 0;
             AdminBuilding = 0;
+            PlatformMaintenance = 0;
             Bus = 0;
             Train = 0;
             Taxi = 0;
@@ -386,9 +373,6 @@ namespace SmartUpkeepManager
             EmployeeUpkeep = 0;
             StorageUpkeep = 0;
             ServiceBudgetMultiplier = false;
-
-            //_dontSave = false;
-            //Save();
         }
     }
 }

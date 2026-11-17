@@ -1,0 +1,16 @@
+{
+  "Option.EnableMod.Label": "Enable mod",
+  "Option.EnableMod.Desc": "When disabled, the mod functionalities will be disabled and all vanilla upkeep values will be restored.",
+  "Option.ModDefault.Label": "Reset to mod defaults",
+  "Option.ModDefault.Desc": "Reset all changes set below to the mod's predefined values. This doesn't revert back to vanilla costs.",
+  "Option.MakeFree.Label": "Set all values to 0",
+  "Option.MakeFree.Desc": "Set all upkeep amount to 0.",
+  "ParkingSpots_Desc": "Specify the upkeep cost for each parking spots. 10% for bicycles",
+  "Option.RoadMaintenance.Label": "Road Maintenance",
+  "RoadMaintenance_Desc": "Specify the upkeep cost for being able to provide road maintenance service.",
+  "Option.SnowPloughing.Label": "Snow Ploughing",
+  "SnowPloughing_Desc": "Specify the upkeep cost for being able to provide snow ploughing service.",
+  "Option.Towing.Label": "Towing",
+  "Towing_Desc": "Specify the upkeep cost for being able to provide towing service.",
+  "RoadMaintenanceVehicle_Desc": "Specify the upkeep cost for each Road Maintenance vehicles."
+}

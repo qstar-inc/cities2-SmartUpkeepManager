@@ -20,91 +20,94 @@ namespace SmartUpkeepManager
             return new Dictionary<string, string>
             {
                 //{ m_Setting.GetSettingsLocaleID(), Mod.Name },
-                { m_Setting.GetOptionTabLocaleID(Setting.Page1), Setting.Page1 },
-                { m_Setting.GetOptionTabLocaleID(Setting.Page2), Setting.Page2 },
-                { m_Setting.GetOptionTabLocaleID(Setting.Page3), Setting.Page3 },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Buttons), Setting.Buttons },
-                //{ m_Setting.GetOptionGroupLocaleID(Setting.GeneralGroup), Setting.GeneralGroup },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Roads), Setting.Roads },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Electricity), Setting.Electricity },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Water), Setting.Water },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Health), Setting.Health },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Garbage), Setting.Garbage },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Education), Setting.Education },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Fire), Setting.Fire },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Police), Setting.Police },
-                {
-                    m_Setting.GetOptionGroupLocaleID(Setting.Transportation),
-                    Setting.Transportation
-                },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Parks), Setting.Parks },
-                { m_Setting.GetOptionGroupLocaleID(Setting.Communication), Setting.Communication },
+                //{ m_Setting.GetOptionTabLocaleID(Setting.Page1), Setting.Page1 },
+                //{ m_Setting.GetOptionTabLocaleID(Setting.Page2), Setting.Page2 },
+                //{ m_Setting.GetOptionTabLocaleID(Setting.Page3), Setting.Page3 },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Buttons), Setting.Buttons },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Generals), Setting.Generals },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Roads), Setting.Roads },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Electricity), Setting.Electricity },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Water), Setting.Water },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Health), Setting.Health },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Garbage), Setting.Garbage },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Education), Setting.Education },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Fire), Setting.Fire },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Police), Setting.Police },
+                //{
+                //    m_Setting.GetOptionGroupLocaleID(Setting.Transportation),
+                //    Setting.Transportation
+                //},
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Parks), Setting.Parks },
+                //{ m_Setting.GetOptionGroupLocaleID(Setting.Communication), Setting.Communication },
                 //{ m_Setting.GetOptionTabLocaleID(Setting.AboutTab), Setting.AboutTab },
                 //{ m_Setting.GetOptionGroupLocaleID(Setting.InfoGroup), Setting.InfoGroup },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.Disable)), "Disable mod" },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.Disable)),
-                    $"The mod will be disabled and all vanilla upkeep values will be restored."
-                },
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.EnableMod)),
+                //    "Disable mod"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.EnableMod)),
+                //    $"The mod will be disabled and all vanilla upkeep values will be restored."
+                //},
                 //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.SaveButton)), "Save Changes" },
                 //{
                 //    m_Setting.GetOptionDescLocaleID(nameof(Setting.SaveButton)),
                 //    $"Save all changes set below."
                 //},
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.ModDefault)),
-                    "Reset to Mod Defaults"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.ModDefault)),
-                    $"Reset all changes set below to the mod's predefined values. This doesn't revert back to vanilla costs."
-                },
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.MakeFree)),
-                    "Set all values to 0"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.MakeFree)),
-                    $"Set all upkeep amount to 0."
-                },
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.ModDefault)),
+                //    "Reset to Mod Defaults"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.ModDefault)),
+                //    $"Reset all changes set below to the mod's predefined values. This doesn't revert back to vanilla costs."
+                //},
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.MakeFree)),
+                //    "Set all values to 0"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.MakeFree)),
+                //    $"Set all upkeep amount to 0."
+                //},
                 // Roads
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.ParkingSpots)),
-                    "Parking Spots"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.ParkingSpots)),
-                    $"Specify the upkeep cost for each parking spots.\r\nMod default: {Defaults.ParkingSpots}"
-                },
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.RoadMaintenance)),
-                    "Road Maintenance"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.RoadMaintenance)),
-                    $"Specify the upkeep cost for being able to provide road maintenance service.\r\nMod default: {Defaults.RoadMaintenance}"
-                },
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.SnowPloughing)),
-                    "Snow Ploughing"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.SnowPloughing)),
-                    $"Specify the upkeep cost for being able to provide snow ploughing service.\r\nMod default: {Defaults.SnowPloughing}"
-                },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.Towing)), "Towing" },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.Towing)),
-                    $"Specify the upkeep cost for being able to provide towing service.\r\nMod default: {Defaults.Towing}"
-                },
-                {
-                    m_Setting.GetOptionLabelLocaleID(nameof(Setting.RoadMaintenanceVehicle)),
-                    "Road Maintenance Vehicles"
-                },
-                {
-                    m_Setting.GetOptionDescLocaleID(nameof(Setting.RoadMaintenanceVehicle)),
-                    $"Specify the upkeep cost for each Road Maintenance vehicles.\r\nMod default: {Defaults.RoadMaintenanceVehicle}"
-                },
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.ParkingSpots)),
+                //    "Parking Spots"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.ParkingSpots)),
+                //    $"Specify the upkeep cost for each parking spots.\r\nMod default: {Defaults.ParkingSpots}"
+                //},
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.RoadMaintenance)),
+                //    "Road Maintenance"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.RoadMaintenance)),
+                //    $"Specify the upkeep cost for being able to provide road maintenance service.\r\nMod default: {Defaults.RoadMaintenance}"
+                //},
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.SnowPloughing)),
+                //    "Snow Ploughing"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.SnowPloughing)),
+                //    $"Specify the upkeep cost for being able to provide snow ploughing service.\r\nMod default: {Defaults.SnowPloughing}"
+                //},
+                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.Towing)), "Towing" },
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.Towing)),
+                //    $"Specify the upkeep cost for being able to provide towing service.\r\nMod default: {Defaults.Towing}"
+                //},
+                //{
+                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.RoadMaintenanceVehicle)),
+                //    "Road Maintenance Vehicles"
+                //},
+                //{
+                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.RoadMaintenanceVehicle)),
+                //    $"Specify the upkeep cost for each Road Maintenance vehicles.\r\nMod default: {Defaults.RoadMaintenanceVehicle}"
+                //},
                 // Electricity
                 {
                     m_Setting.GetOptionLabelLocaleID(nameof(Setting.SolarPowered)),
@@ -839,28 +842,10 @@ namespace SmartUpkeepManager
                     m_Setting.GetOptionDescLocaleID(nameof(Setting.StorageUpkeep)),
                     $"Specify the upkeep cost for having the storage for each tonne of resource. This is not the same as resource cost. This will be incurring whether something is stored or not.\r\nMod default: {Defaults.StorageUpkeep}"
                 },
-                //{
-                //    m_Setting.GetOptionLabelLocaleID(nameof(Setting.VerboseLogging)),
-                //    "Verbose Logging"
-                //},
-                //{
-                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.VerboseLogging)),
-                //    $"Enable detailed logging for troubleshooting."
-                //},
-                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Mod Name" },
-                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.NameText)), "" },
-                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Mod Version" },
-                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.VersionText)), "" },
-                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.AuthorText)), "Author" },
-                //{ m_Setting.GetOptionDescLocaleID(nameof(Setting.AuthorText)), "" },
-                //{ m_Setting.GetOptionLabelLocaleID(nameof(Setting.BMaCLink)), "Buy Me a Coffee" },
-                //{
-                //    m_Setting.GetOptionDescLocaleID(nameof(Setting.BMaCLink)),
-                //    "Support the author."
-                //},
             };
         }
 
         public void Unload() { }
     }
 }
+//{\s*m_Setting\.GetOptionLabelLocaleID\(nameof\(Setting\.(\w+)\)\),\s*"(.+)"\s*},\s*{\s*m_Setting\.GetOptionDescLocaleID\(nameof\(Setting\.\1\)\),\s*\$*"(.+)"\s*},
